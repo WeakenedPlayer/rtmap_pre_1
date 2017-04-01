@@ -5,7 +5,8 @@ import { HttpModule } from '@angular/http';
 import { AngularFireModule, AuthProviders, AuthMethods } from 'angularfire2';
 
 import { AppComponent } from './app.component';
-import { Census } from '../service';
+import { Census, ID } from '../service';
+import { ViewModule } from './view/view.module';
 
 const firebaseConfig = {
         apiKey: "AIzaSyDGS2xVjmK_q5HtLfOg5TztHz_Ftu00bQ8",
@@ -26,12 +27,13 @@ const firebaseAuthConfig = {
     AppComponent
   ],
   imports: [
+    ViewModule,
     BrowserModule,
     FormsModule,
     HttpModule,
     AngularFireModule.initializeApp( firebaseConfig, firebaseAuthConfig )
     ],
-    providers: [ Census.Service ],
+    providers: [ Census.Service, ID.Service ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

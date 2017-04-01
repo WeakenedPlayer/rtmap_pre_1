@@ -75,9 +75,7 @@ export class ObjectMapper {
 
         console.log( dbObject );
         let ref = this.af.database.object( this.path.toUrl( object ) );
-        return new Promise( ( resolve ) => {
-            ref.set( dbObject ).then( ()=>{ resolve(); } );
-        } );
+        return ref.set( dbObject ) as Promise<void>;
     }
 
     // --------------------------------------------------------------------------------------------
@@ -89,11 +87,7 @@ export class ObjectMapper {
         let dbObject = this.toDbObject( object );
 
         let ref = this.af.database.object( this.path.toUrl( object ) );
-        return ( ref.update( dbObject ) as Promise<void> ).then( ()=>{
-            // console.log( 'update is done');
-            // console.log( dbObject);
-            return Promise.resolve();
-        });
+        return ref.update( dbObject ) as Promise<void>;
     }
     
     // --------------------------------------------------------------------------------------------
@@ -112,11 +106,7 @@ export class ObjectMapper {
     // オブジェクトを削除する
     // --------------------------------------------------------------------------------------------
     remove( keys?: any ): Promise<void> {
-        return new Promise( (resolve) => {
-            this.af.database.object( this.path.toUrl( keys) ).remove().then( ()=>{
-                resolve();
-            } );
-        } );
+        return this.af.database.object( this.path.toUrl( keys) ).remove() as Promise<void>;
     }
     
     // --------------------------------------------------------------------------------------------
@@ -124,10 +114,6 @@ export class ObjectMapper {
     // TODO: さらに上の階層で削除がいる場合は想定していなかったが、必要なら作ること。
     // --------------------------------------------------------------------------------------------
     removeAll( keys?: any ): Promise<void> {
-        return new Promise( (resolve) => {
-            this.af.database.object( this.path.getParent().toUrl( keys ) ).remove().then( ()=>{
-                resolve();
-            } );
-        } );
+        return this.af.database.object( this.path.getParent().toUrl( keys ) ).remove() as Promise<void>;
     }
 }

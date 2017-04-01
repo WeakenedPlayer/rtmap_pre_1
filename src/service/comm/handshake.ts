@@ -45,7 +45,7 @@ export abstract class Handshake<RECEPTION,CLIENT> extends DB.SimpleMapper<Comm.H
     }
     
     // 応答をブロックしたうえで、判定結果を入力し、完了状態にする。
-    terminate(): Promise<void> {
+    terminate(): Promise<boolean> {
         // console.log( 'Handshake: Start terminating...' );
         return this.state.conclude( ()=>{
             // console.log( 'Handshake: Start checking snapshot' );
