@@ -18,7 +18,7 @@
 </div>
 
 <ng-template #LoggingIn>
-  <alert class="info">Logging in...</alert>
+  <alert type="info">Logging in...</alert>
 </ng-template>
 
 <ng-template #NotLoggedIn>
@@ -27,13 +27,12 @@
 	</div>
 </ng-template>
 
-
 <ng-template #CheckingPermission>
-  <alert class="info">Checking your permission...</alert>
+  <alert type="info">Checking your permission...</alert>
 </ng-template>
 
 <ng-template #PermissionDenied>
-	<alert class="danger">Permission denied.</alert>
+	<alert type="danger">Permission denied.</alert>
 	<div class="btn-group btn-group-justified">
 	  <a href="#" class="btn btn-default" (click)="signout()">Logout</a>
 	</div>
