@@ -3,8 +3,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 import { LocationStrategy, HashLocationStrategy, CommonModule } from '@angular/common';
-import { AlertModule } from 'ng2-bootstrap';
-
+import { AlertModule, ButtonsModule } from 'ng2-bootstrap';
 
 import { LandingComponent } from './landing/landing.component';
 import { NotFoundComponent } from './not-found/not-found.component';
@@ -33,7 +32,8 @@ const routes: Routes = [
              CommonModule,
              ReactiveFormsModule,
              RouterModule.forRoot(routes),
-             AlertModule.forRoot()],
+             AlertModule.forRoot(),
+             ButtonsModule.forRoot(),],
   exports: [ RouterModule, 
              LandingComponent, 
              NotFoundComponent ],

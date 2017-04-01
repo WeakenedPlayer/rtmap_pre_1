@@ -22,6 +22,9 @@ import { Observable, Subscription } from 'rxjs';
 export class ViewModel {
     //　外部に公開する状態(書き込みはしないこと)
     // 第1段階: ログイン情報の取得
+    userNameObservable: Observable<string>;
+    loginObservable: Observable<boolean>;
+    
     isLoginCheckCompleted: boolean = false;
     isLoggedIn: boolean = false;
     userName: string = null;
@@ -39,20 +42,10 @@ export class ViewModel {
                  private ids: ID.Service ){
         this.userInfoRepo = new ID.UserInfoRepo( af, DB.Path.fromUrl('/ids') );
         
-        let loginCheck = this.ids.authStateObservable.do( authState => {
-            // 初回のみ
-            if( !this.isLoginCheckCompleted ) {
-                this.isLoginCheckCompleted = true;
-            }
-            if( authState ) {
-                this.isLoggedIn = true;
-                this.userName = authState.auth.displayName;
-            } else {
-                this.isLoggedIn = false;
-                this.userName = null;
-            }
-        } );
-        
+        this.userNameObservable = this.ids.authStateObservable
+                                          .map( authState => authState ? authState.auth.displayName : null )
+                                          .publishReplay(1).refCount();
+
         let admittanceCheck = this.ids.currentUserObservable.do( user => {
             // 初回のみ
             if( !this.isAdmittanceCheckCompleted ) {
@@ -63,7 +56,6 @@ export class ViewModel {
         
         // 認証状態を確認
         this.subscription = new Subscription();
-        this.subscription.add( loginCheck.subscribe() );
         this.subscription.add( admittanceCheck.subscribe() );
     }
     
