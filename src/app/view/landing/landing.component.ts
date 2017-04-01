@@ -13,24 +13,45 @@ import * as VM from './view-model';
   styleUrls: ['./landing.component.scss']
 })
 export class LandingComponent implements OnInit, OnDestroy {
-    vm: VM.ViewModel;
-    msg: string = 'n/a';
-    isLoggedIn: boolean = false;
-    constructor( private af: AngularFire, private idservice: ID.Service ) {
-        this.vm = new VM.ViewModel(af, idservice );
+    errorMessage: string = '';
+
+    get $isAuthStateLoaded(){ return this.ids.$isAuthStateLoaded; }
+    get $isCurrentUserLoaded(){ return this.ids.$isCurrentUserLoaded; }
+    get $currentUser(){ return this.ids.$currentUser; }
+    get $isLoggedIn(){ return this.ids.$authState.map( authState => authState ? true : false ); }
+    get $currentUserHasAdmittance(){ return this.ids.$currentUser.map( user => user.hasAdmittance); }
+
+    constructor( private af: AngularFire, private ids: ID.Service ) {
     }
     ngOnInit(){}
     ngOnDestroy() {}
     
-    login() {
-        this.vm.login();
+    login(): Promise<void> {
+        this.setErrorMessage();
+        return this.ids.login().catch( err => {
+            this.setErrorMessage( err );
+        } );
     }
 
-    logout() {
-        this.vm.logout();
+    logout(): Promise<void> {
+        this.setErrorMessage();
+        return this.ids.logout().catch( err => {
+            this.setErrorMessage( err );
+        } );
     }
-
-    signout() {
-        this.vm.signout();
+    
+    signout(): Promise<void> {
+        this.setErrorMessage();
+        return this.ids.signout().catch( err => {
+            this.setErrorMessage( err );
+        } );
+    }
+    
+    private setErrorMessage( msg?: string ) {
+        if( msg ) {
+            this.errorMessage = msg;
+        } else {
+            this.errorMessage = '';
+        }
     }
 }

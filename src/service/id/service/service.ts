@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Headers, Http } from '@angular/http';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, Subscription, BehaviorSubject } from 'rxjs';
 import { AngularFire, AngularFireAuth, FirebaseAuthState } from 'angularfire2';
 import * as firebase from 'firebase';
 
@@ -9,8 +9,18 @@ import { ID, DB } from '../../';
 const rootUrl = '/ids';
 @Injectable()
 export class Service {
-    currentUserObservable: Observable<ID.UserInfo>;
-    authStateObservable: Observable<FirebaseAuthState>;
+    // private化する
+    private currentUserObservable: Observable<ID.UserInfo>;
+    private authStateObservable: Observable<FirebaseAuthState>;
+
+    // 読み込み状況...読み込み開始～完了までが false であること。
+    private isAuthStateLoaded: BehaviorSubject<boolean> = new BehaviorSubject(false);
+    private isCurrentUserLoaded: BehaviorSubject<boolean> = new BehaviorSubject(false);
+
+    get $authState(){ return this.authStateObservable; }
+    get $currentUser(){ return this.currentUserObservable; }
+    get $isAuthStateLoaded(){ return this.isAuthStateLoaded; }
+    get $isCurrentUserLoaded(){ return this.isCurrentUserLoaded; }
 
     userRepos: ID.UserInfoRepo;
     //reqRepos: ID.RequestRepos;
@@ -24,7 +34,11 @@ export class Service {
         this.userRepos = new ID.UserInfoRepo( this.af, root );
         // this.reqRepos = new ID.RequestRepos( this.af, root );
 
-        this.authStateObservable = ( this.af.auth as Observable<FirebaseAuthState> ).publishReplay(1).refCount();
+        this.authStateObservable = ( this.af.auth as Observable<FirebaseAuthState> ).do( authState => {
+            this.isAuthStateLoaded.next( true );    // 一度読まれたことを保持する
+            return authState;
+        } ).publishReplay(1).refCount();
+        
         this.currentUserObservable = this.authStateObservable
                                          .flatMap( authState => this.postAuthentication( authState ) )
                                          .publishReplay(1).refCount();
@@ -33,6 +47,7 @@ export class Service {
         this.subscription.add( this.authStateObservable.subscribe() );
         this.subscription.add( this.currentUserObservable.subscribe() );
     }
+    
 
     // --------------------------------------------------------------------------------------------
     // ログイン後に1回だけ行う、最終ログイン日更新(UIDの登録がなければ登録)
@@ -55,6 +70,7 @@ export class Service {
                 }
                 return next;
             } ).flatMap( registeredUser => {
+                this.isCurrentUserLoaded.next( true );
                 return this.userRepos.getById( registeredUser.id );
             } );
         } else {
@@ -65,9 +81,10 @@ export class Service {
     // ログイン後に1回だけ行う、最終ログイン日更新(UIDの登録がなければ登録)
     // --------------------------------------------------------------------------------------------
     login(): Promise<FirebaseAuthState> {
-        if( this.af.auth ){
-            return ( this.af.auth.login() as Promise<FirebaseAuthState> );
-        }
+        // 読み込み状況を更新
+        this.isAuthStateLoaded.next( false );
+        this.isCurrentUserLoaded.next( false );
+        return ( this.af.auth.login() as Promise<FirebaseAuthState> );
     }
 
     logout(): Promise<void> {

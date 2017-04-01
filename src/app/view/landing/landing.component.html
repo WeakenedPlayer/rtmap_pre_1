@@ -3,37 +3,38 @@
     <h1 class="text-center login-title">Planetside2 Realtime Map</h1>
       <img class="profile-img" src="assets/img/logo.png" alt="">
       
-<div *ngIf="(vm.userNameObservable | async) !== null; then loginCheckCompleted else loginCheckNotCompleted"></div>
-
-<ng-template #loginCheckCompleted>
-<div class="btn-group btn-group-justified">
-  <a href="#" class="btn btn-default" (click)="vm.logout()">Logout</a>
-  <a href="#" class="btn btn-default" (click)="vm.login()">Enter</a>
-</div>
-</ng-template>
-
-<ng-template #loginCheckNotCompleted>
-<alert class="info">please wait...</alert>
-</ng-template>
-
-<ng-template #isLoggedIn>
-<div class="btn-group btn-group-justified">
-  <a href="#" class="btn btn-default" (click)="vm.logout()">Logout</a>
-  <a href="#" class="btn btn-default" (click)="vm.login()">Enter</a>
-</div>
-</ng-template>
-
-<ng-template #isNotLoggedIn>
-<div class="btn-group btn-group-justified">
-  <a href="#" class="btn btn-default" (click)="vm.login()">Login</a>
-</div>
-</ng-template>
-
-  </div>
+	<div *ngIf="( $isAuthStateLoaded | async ); else LoggingIn">
+	  <div *ngIf="( $isLoggedIn | async ); else NotLoggedIn">
+	    <div *ngIf="( $isCurrentUserLoaded | async ); else CheckingPermission">
+	      <div *ngIf="( $currentUserHasAdmittance | async ); else PermissionDenied">
+	        <div class="btn-group btn-group-justified">
+					  <a href="#" class="btn btn-default" (click)="logout()">Logout</a>
+					  <a href="#" class="btn btn-default" (click)="login()">Enter</a>
+					</div>
+				</div>
+			</div>
+	  </div>
+	</div>
 </div>
 
-<ul>
-<li><a routerLink="/character/search">検索画面</a></li>
-<li><a routerLink="/request/list/0">list</a></li>
-<li><a routerLink="/character/show/5428123302633481745">キャラクター表示画面(遷移例)</a></li>
-</ul>
+<ng-template #LoggingIn>
+  <alert class="info">Logging in...</alert>
+</ng-template>
+
+<ng-template #NotLoggedIn>
+	<div class="btn-group btn-group-justified">
+	  <a href="#" class="btn btn-default" (click)="login()">Login</a>
+	</div>
+</ng-template>
+
+
+<ng-template #CheckingPermission>
+  <alert class="info">Checking your permission...</alert>
+</ng-template>
+
+<ng-template #PermissionDenied>
+	<alert class="danger">Permission denied.</alert>
+	<div class="btn-group btn-group-justified">
+	  <a href="#" class="btn btn-default" (click)="signout()">Logout</a>
+	</div>
+</ng-template>

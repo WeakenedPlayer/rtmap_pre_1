@@ -96,18 +96,20 @@ export class State extends DB.SimpleMapper<StateSnapshot> {
     /* --------------------------------------------------------------------------------------------
      * 状態の判定
      * ----------------------------------------------------------------------------------------- */
-    private check( decision: ( state: StateSnapshot ) => boolean ) {
-        return this.getOnce().then( state => {
-            // stateが存在しなければ中断する
-            if( !state ) {
-                return Promise.reject( 'Unable to check state.');
-            }
-            return Promise.resolve( decision( state ) );
-        } );
+    private check( decision: ( state: StateSnapshot ) => boolean ): Promise<boolean> {
+        return new Promise( ( resolve, reject ) => {
+            return this.getOnce().then( state => {
+                // stateが存在しなければ中断する
+                if( !state ) {
+                    reject( 'Unable to check state.');
+                }
+                resolve( decision( state ) );
+            } );
+        });
     }
     // 初期化されているか
     checkIfInitialized(): Promise<boolean> {
-        return this.check( state =>  state.initialized );
+        return this.check( ( state ) => { return state.initialized; } );
     }
     
     // ブロックされているか
