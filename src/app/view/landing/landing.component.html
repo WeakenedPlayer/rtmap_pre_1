@@ -9,7 +9,7 @@
 	      <div *ngIf="( $currentUserHasAdmittance | async ); else PermissionDenied">
 	        <div class="btn-group btn-group-justified">
 					  <a href="#" class="btn btn-default" (click)="logout()">Logout</a>
-					  <a href="#" class="btn btn-default" (click)="login()">Enter</a>
+					  <a routerLink="menu" class="btn btn-default">Enter</a>
 					</div>
 				</div>
 			</div>

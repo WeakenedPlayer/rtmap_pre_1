@@ -7,6 +7,7 @@ import { AlertModule, ButtonsModule } from 'ng2-bootstrap';
 
 import { LandingComponent } from './landing/landing.component';
 import { NotFoundComponent } from './not-found/not-found.component';
+import { MainMenuComponent } from './main-menu/main-menu.component';
 // このモジュールは、Routerで各ビューをつなぐ役割をになう
 // より複雑になってきたら、forRootを外部に持ち、ここではforChildだけつくることにする。
 // Refactor routes to a routing module: https://angular.io/docs/ts/latest/tutorial/toh-pt5.html
@@ -21,13 +22,13 @@ import { NotFoundComponent } from './not-found/not-found.component';
 */
 const routes: Routes = [
                         // { path: 'handhsake',  component: TestHandshakeComponent },
-                        { path: 'landing',  component: LandingComponent },
-                        { path: '',   redirectTo: '/landing', pathMatch: 'full' },
+                        { path: '',  component: LandingComponent },
+                        { path: 'menu',  component: MainMenuComponent },
                         { path: '**', component: NotFoundComponent }
                       ];
 @NgModule({
   declarations: [ LandingComponent, 
-                  NotFoundComponent, ],
+                  NotFoundComponent, MainMenuComponent, ],
   imports: [ BrowserModule,
              CommonModule,
              ReactiveFormsModule,
