@@ -1,4 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
+import { CharacterProfile } from './sub/profile/character-profile';
+import { Location } from '@angular/common';
+import { Router } from '@angular/router';
+import { ID } from 'service';
 
 @Component({
   selector: 'app-dashboard',
@@ -6,10 +10,21 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit {
+    profile: CharacterProfile;
+    constructor( private location: Location, private router: Router, private ids: ID.Service ) {
+        this.profile = new CharacterProfile( 'hello', 'world', 'faction', '123');
+        console.log( this.profile );
+    }
 
-  constructor() { }
+    ngOnInit() {
+        console.log( this.profile );
+    }
 
-  ngOnInit() {
-  }
-
+    goBack() {
+        this.location.back();
+    }
+    
+    toLanding() {
+        this.router.navigate( [ '/' ] );
+    }
 }

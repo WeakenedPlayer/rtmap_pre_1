@@ -8,8 +8,8 @@
 	    <div *ngIf="( $isCurrentUserLoaded | async ); else CheckingPermission">
 	      <div *ngIf="( $currentUserHasAdmittance | async ); else PermissionDenied">
 	        <div class="btn-group btn-group-justified">
-            <a href="#" class="btn btn-default" (click)="signout()">Logout from<span class="icon"></span></a>
-					  <a routerLink="dashboard" class="btn btn-default">Enter</a>
+            <a href="#" class="btn btn-default landing-button" (click)="signout()">Logout from<span class="icon"></span></a>
+					  <a routerLink="dashboard" class="btn btn-primary landing-button"><span>Enter</span></a>
 					</div>
 				</div>
 			</div>

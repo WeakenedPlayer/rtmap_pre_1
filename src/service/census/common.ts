@@ -25,7 +25,7 @@ export abstract class QueryBase<ParameterT,ResponseT,ResultT> {
                 return this.extract( ( response.json() ) as ResponseT );
             } else {
                 // error
-                return Observable.empty;
+                return Observable.throw( response.status );
             }
         } );
     }
