@@ -9,6 +9,7 @@ import { UiModule } from '../ui/ui.module';
 import { LandingComponent } from './landing/landing.component';
 import { NotFoundComponent } from './not-found/not-found.component';
 import { MainMenuComponent } from './main-menu/main-menu.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
 // このモジュールは、Routerで各ビューをつなぐ役割をになう
 // より複雑になってきたら、forRootを外部に持ち、ここではforChildだけつくることにする。
 // Refactor routes to a routing module: https://angular.io/docs/ts/latest/tutorial/toh-pt5.html
@@ -25,11 +26,12 @@ const routes: Routes = [
                         // { path: 'handhsake',  component: TestHandshakeComponent },
                         { path: '',  component: LandingComponent },
                         { path: 'menu',  component: MainMenuComponent },
+                        { path: 'dashboard',  component: DashboardComponent },
                         { path: '**', component: NotFoundComponent }
                       ];
 @NgModule({
   declarations: [ LandingComponent, 
-                  NotFoundComponent, MainMenuComponent, ],
+                  NotFoundComponent, MainMenuComponent, DashboardComponent, ],
   imports: [ BrowserModule,
              CommonModule,
              ReactiveFormsModule,
