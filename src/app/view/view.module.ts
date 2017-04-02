@@ -4,6 +4,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 import { LocationStrategy, HashLocationStrategy, CommonModule } from '@angular/common';
 import { AlertModule, ButtonsModule } from 'ng2-bootstrap';
+import { UiModule } from '../ui/ui.module';
 
 import { LandingComponent } from './landing/landing.component';
 import { NotFoundComponent } from './not-found/not-found.component';
@@ -33,6 +34,7 @@ const routes: Routes = [
              CommonModule,
              ReactiveFormsModule,
              RouterModule.forRoot(routes),
+             UiModule,
              AlertModule.forRoot(),
              ButtonsModule.forRoot(),],
   exports: [ RouterModule, 

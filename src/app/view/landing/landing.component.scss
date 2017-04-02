@@ -65,12 +65,16 @@
     -webkit-border-radius: 50%;
     border-radius: 50%;
 }
-.need-help
-{
-    margin-top: 10px;
-}
 .new-account
 {
     display: block;
     margin-top: 10px;
+}
+
+span.icon {
+  background: url('/assets/icon/g-normal.png') transparent 5px 50% no-repeat;
+  display: inline-block;
+  vertical-align: middle;
+  width: 32px;
+  height: 32px;
 }
