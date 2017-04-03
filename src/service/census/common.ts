@@ -18,7 +18,7 @@ export abstract class QueryBase<ParameterT,ResponseT,ResultT> {
     constructor( private http: Http, private baseProvider: IBaseUrlProvider ) {
     }
 
-    get( param: ParameterT ): Observable<any> {
+    get( param?: ParameterT ): Observable<ResultT> {
         return this.http.get( this.baseProvider.get() + this.queryUrl( param ) )
         .map( response => {
             if( response.status === 200 ) {

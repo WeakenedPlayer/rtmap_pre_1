@@ -22,7 +22,11 @@ export class WorldGetter extends Common.QueryBase<string[],WorldList,World[]>{
     }
     
     queryUrl( worldIds: string[] ): string {
-        return 'world?world_id='+ worldIds.join(',');
+        if( worldIds ) {
+            return 'world?world_id='+ worldIds.join(',');
+        } else {
+            return 'world?c:limit=100'; // 全サーバ取得(100はよっぽど大丈夫だろうという数字)
+        }
     }
     
     extract( response: WorldList ): World[] {

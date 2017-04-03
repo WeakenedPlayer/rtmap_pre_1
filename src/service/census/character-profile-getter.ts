@@ -52,7 +52,7 @@ export class CharacterProfileGetter extends Common.QueryBase<string[],CharacterP
         this.joinQuery = '&' + outfitQuery.toString() + '&' + onlineQuery.toString() + '&' + worldQuery.toString();
     }
     
-    queryUrl( characterIds: string[] ): string {
+    queryUrl( characterIds?: string[] ): string {
         return 'character?character_id='+ characterIds.join(',') + this.joinQuery;
     }
     extract( response: CharacterProfileList ): CharacterProfile[] {

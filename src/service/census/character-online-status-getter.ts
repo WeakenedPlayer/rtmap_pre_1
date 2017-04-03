@@ -17,7 +17,7 @@ export class CharacterOnlineStatusGetter extends Common.QueryBase<string[],Chara
         super( http, baseProvider );
     }
     
-    queryUrl( characterIds: string[] ): string {
+    queryUrl( characterIds?: string[] ): string {
         return 'characters_online_status?character_id='+ characterIds.join(',');
     }
     extract( response: CharacterProfileList ): CharacterOnlineStatus[] {
