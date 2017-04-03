@@ -8,22 +8,21 @@
 	    <div *ngIf="( $isCurrentUserLoaded | async ); else CheckingPermission">
 	      <div *ngIf="( $currentUserHasAdmittance | async ); else PermissionDenied">
 	        <div class="btn-group btn-group-justified">
-					  <a href="#" class="btn btn-default" (click)="logout()">Logout</a>
-					  <a href="#" class="btn btn-default" (click)="login()">Enter</a>
+            <a href="#" class="btn btn-default landing-button" (click)="signout()">Logout from<span class="icon"></span></a>
+					  <a routerLink="dashboard" class="btn btn-primary landing-button"><span>Enter</span></a>
 					</div>
 				</div>
 			</div>
 	  </div>
 	</div>
 </div>
-
 <ng-template #LoggingIn>
   <alert type="info">Logging in...</alert>
 </ng-template>
 
 <ng-template #NotLoggedIn>
 	<div class="btn-group btn-group-justified">
-	  <a href="#" class="btn btn-default" (click)="login()">Login</a>
+	  <a href="#" class="btn btn-default" (click)="login()">Login with <span class="icon"></span></a>
 	</div>
 </ng-template>
 
@@ -34,6 +33,7 @@
 <ng-template #PermissionDenied>
 	<alert type="danger">Permission denied.</alert>
 	<div class="btn-group btn-group-justified">
-	  <a href="#" class="btn btn-default" (click)="signout()">Logout</a>
+    <a href="#" class="btn btn-default" (click)="signout()">Logout from<span class="icon"></span></a>
 	</div>
 </ng-template>
+

@@ -1,0 +1,70 @@
+<div class="row">
+  <div class="input-group ui-toolbar">
+    <span class="glyphicon glyphicon-chevron-left ui-toolbar-btn" (click)="goBack()"></span>
+    <span class="ui-toolbar-title">Dashboard</span>
+    <i class="glyphicon glyphicon-home ui-toolbar-btn" (click)="gotoLanding()"></i>
+  </div>
+</div>
+
+<div class="row">
+<table class="table table-filter">
+<tbody>
+<tr data-status="cancelado">
+  <td>
+    <div class="media">
+    <a href="#" class="pull-left"><i class="material-icons menu-item">account_circle</i>
+    </a>
+      <div class="media-body">
+      <h4 class="title">Character</h4>
+      <p class="summary">キャラクタ名</p>
+      <app-profile [profile]="profile"></app-profile>
+      </div>
+    </div>
+  </td>
+</tr>
+<tr data-status="cancelado">
+  <td>
+    <div class="media">
+    <a routerLink="/map" class="pull-left"><i class="glyphicon glyphicon-globe menu-item"></i>
+    </a>
+      <div class="media-body">
+      <h4 class="title">Map</h4>
+      <p class="summary">Connery</p>
+        <table class="table">
+        <tbody>
+        <tr><td>Indar</td></tr>
+        <tr><td>Amerish</td></tr>
+        <tr><td>Esamir</td></tr>
+        <tr><td>Hossin</td></tr>
+        </tbody></table>
+      </div>
+    </div>
+  </td>
+</tr>
+<tr data-status="cancelado">
+  <td>
+    <div class="media">
+    <a href="#" class="pull-left"><i class="glyphicon glyphicon-cog menu-item"></i>
+    </a>
+      <div class="media-body">
+      <h4 class="title">Setting</h4>
+      <p class="summary">----</p>
+      </div>
+    </div>
+  </td>
+</tr>
+<tr data-status="cancelado">
+  <td>
+    <div class="media">
+    <a href="#" class="pull-left"><i class="material-icons menu-item">assignment_ind</i>
+    </a>
+      <div class="media-body">
+      <h4 class="title">User Administration</h4>
+      <p class="summary">----</p>
+      </div>
+    </div>
+  </td>
+</tr>
+</tbody>
+</table>
+</div>

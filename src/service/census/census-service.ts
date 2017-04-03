@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Pipe, PipeTransform } from '@angular/core';
 import { Headers, Http } from '@angular/http';
 import { Observable } from 'rxjs';
 

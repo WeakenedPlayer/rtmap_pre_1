@@ -7,6 +7,12 @@ class CharacterProfileList {
     character_list: CharacterProfile[];
 }
 
+export class CharacterOutfit {
+    member_rank: string;
+    name: string;
+    alias: string;
+};
+
 /* CensusAPI が返してくる応答の一部 */
 export class CharacterProfile {
     character_id: string;
@@ -18,11 +24,7 @@ export class CharacterProfile {
         percent_to_next: number;
         value: number;
     };
-    outfit: {
-        member_rank: string;
-        name: string;
-        alias: string;
-    };
+    outfit: CharacterOutfit;
     faction: {
         faction_id: number;
         name: {
@@ -54,6 +56,7 @@ export class CharacterProfileGetter extends Common.QueryBase<string[],CharacterP
         return 'character?character_id='+ characterIds.join(',') + this.joinQuery;
     }
     extract( response: CharacterProfileList ): CharacterProfile[] {
+            console.log( response.character_list );
         return response.character_list;
     }
 }

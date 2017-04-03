@@ -5,8 +5,6 @@ import { Subscription, Observable } from 'rxjs';
 import { ID } from '../../../service';
 import 'rxjs/add/operator/toPromise';
 
-import * as VM from './view-model';
-
 @Component({
   selector: 'landing',
   templateUrl: './landing.component.html',
