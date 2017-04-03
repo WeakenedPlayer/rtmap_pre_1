@@ -8,8 +8,8 @@ import { CommonModule } from '@angular/common';
   declarations: [  ],
   imports: [ BrowserModule,
              CommonModule,
-             ReactiveFormsModule,],
-  exports: [  ],
+             ReactiveFormsModule ],
+  exports: [ ],
   providers: []
 })
 export class UiModule { }

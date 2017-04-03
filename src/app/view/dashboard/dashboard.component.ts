@@ -23,8 +23,11 @@ export class DashboardComponent implements OnInit {
     goBack() {
         this.location.back();
     }
-    
-    toLanding() {
+
+    gotoLanding() {
         this.router.navigate( [ '/' ] );
+    }
+    gotoMap() {
+        this.router.navigate( [ '/map' ] );
     }
 }

@@ -1,0 +1,7 @@
+@import '../view.common.scss';
+.map {
+  position: absolute;
+  top: $toolbar_height;
+  bottom: 0px;
+  width: 100%;
+}

@@ -2,7 +2,7 @@
   <div class="input-group ui-toolbar">
     <span class="glyphicon glyphicon-chevron-left ui-toolbar-btn" (click)="goBack()"></span>
     <span class="ui-toolbar-title">Dashboard</span>
-    <i class="glyphicon glyphicon-home ui-toolbar-btn" (click)="toLanding()"></i>
+    <i class="glyphicon glyphicon-home ui-toolbar-btn" (click)="gotoLanding()"></i>
   </div>
 </div>
 
@@ -25,7 +25,7 @@
 <tr data-status="cancelado">
   <td>
     <div class="media">
-    <a href="#" class="pull-left"><i class="glyphicon glyphicon-globe menu-item"></i>
+    <a routerLink="/map" class="pull-left"><i class="glyphicon glyphicon-globe menu-item"></i>
     </a>
       <div class="media-body">
       <h4 class="title">Map</h4>
