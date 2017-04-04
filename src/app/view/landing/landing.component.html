@@ -7,6 +7,7 @@
 	  <div *ngIf="( $isLoggedIn | async ); else NotLoggedIn">
 	    <div *ngIf="( $isCurrentUserLoaded | async ); else CheckingPermission">
 	      <div *ngIf="( $currentUserHasAdmittance | async ); else PermissionDenied">
+          <alert type="success">Welcome {{ $userName | async }}.</alert>
 	        <div class="btn-group btn-group-justified">
             <a href="#" class="btn btn-default landing-button" (click)="signout()">Logout from<span class="icon"></span></a>
 					  <a routerLink="dashboard" class="btn btn-primary landing-button"><span>Enter</span></a>

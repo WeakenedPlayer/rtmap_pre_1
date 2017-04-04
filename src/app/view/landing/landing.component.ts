@@ -14,9 +14,10 @@ export class LandingComponent implements OnInit, OnDestroy {
     errorMessage: string = '';
 
     get $isAuthStateLoaded(){ return this.ids.$isAuthStateLoaded; }
+    get $userName(){ return this.ids.$authState.map( authState => authState ? authState.auth.displayName : '' ) }
     get $isCurrentUserLoaded(){ return this.ids.$isCurrentUserLoaded; }
     get $currentUser(){ return this.ids.$currentUser; }
-    get $isLoggedIn(){ return this.ids.$authState.map( authState => authState ? true : false ); }
+    get $isLoggedIn(){ return this.ids.$authState.map( authState => !!authState ); }
     get $currentUserHasAdmittance(){ return this.ids.$currentUser.map( user => user.hasAdmittance); }
 
     constructor( private af: AngularFire, private ids: ID.Service ) {
