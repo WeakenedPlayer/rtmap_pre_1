@@ -14,7 +14,7 @@ import { LeafletMarkerComponent } from './components/marker/marker.component';
   exports: [
     LeafletMapComponent,
     LeafletTileComponent,
-    LeafletMarkerComponent
+    LeafletMarkerComponent,
   ],
   providers: [
   ],
