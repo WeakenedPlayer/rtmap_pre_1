@@ -5,13 +5,11 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { LocationStrategy, HashLocationStrategy, CommonModule } from '@angular/common';
 import { AlertModule, ButtonsModule } from 'ng2-bootstrap';
 import { UiModule } from '../ui/ui.module';
-import { LeafletModule } from '../leaflet/leaflet.module';
 
 import { LandingComponent } from './landing/landing.component';
 import { NotFoundComponent } from './not-found/not-found.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ProfileComponent } from './dashboard/sub/profile/profile.component';
-import { SampleMapComponent } from '../leaflet/sample-map/sample-map.component';
 import { MapViewComponent } from './map-view/map-view.component';
 // このモジュールは、Routerで各ビューをつなぐ役割をになう
 // より複雑になってきたら、forRootを外部に持ち、ここではforChildだけつくることにする。
@@ -29,13 +27,12 @@ const routes: Routes = [
                       ];
 @NgModule({
   declarations: [ LandingComponent, 
-                  NotFoundComponent, DashboardComponent, ProfileComponent, MapViewComponent, SampleMapComponent, ],
+                  NotFoundComponent, DashboardComponent, ProfileComponent, MapViewComponent ],
   imports: [ BrowserModule,
              CommonModule,
              ReactiveFormsModule,
              RouterModule.forRoot(routes),
              UiModule,
-             LeafletModule,
              AlertModule.forRoot(),
              ButtonsModule.forRoot(),],
   exports: [ RouterModule, 
