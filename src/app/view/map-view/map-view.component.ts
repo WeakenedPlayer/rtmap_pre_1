@@ -2,6 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
 import { Leaflet, Map } from '../../ui';
+import { Observable } from 'rxjs';
 
 const MapOption: Leaflet.MapOptions = {
         crs: Leaflet.CRS.Simple,
@@ -27,10 +28,20 @@ const ContinentInfoList = [
 
 class MyMapControl extends Map.Control {
     private tile: Leaflet.TileLayer;
+    private markers: Map.MarkerObserver = new Map.MarkerObserver();
     
     protected postMapCreated(): void {
         this.tile = Leaflet.tileLayer( ContinentInfoList[0].url, TileOption );
         this.map.addLayer( this.tile );
+        this.map.addLayer( this.markers.getLayerGroup() );
+        
+        let operations = [ new Map.MarkerMoveOperation( '1', 0, 0 ),
+                           new Map.MarkerMoveOperation( '2', 0, 100 ),
+                           new Map.MarkerMoveOperation( '3', -100, 0 ),
+                           new Map.MarkerMoveOperation( '2', -200, 200 ),
+                           new Map.MarkerMoveOperation( '3', -200, 100 ) ];
+        
+        Observable.of( operations ).subscribe( this.markers );
     }
     
     protected mapOptions(): Leaflet.MapOptions {
