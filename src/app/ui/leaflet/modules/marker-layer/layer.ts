@@ -1,6 +1,7 @@
+import * as Leaflet from 'leaflet';
 import { Observer, Subject } from 'rxjs';
-import { Map, Leaflet } from '../';
 
+import * as This from './modules';
 /*
 // marker observable
 // 既にあるものは移動し、消えたものは消すし、ないものは作る
@@ -15,32 +16,8 @@ import { Map, Leaflet } from '../';
  * 集約後は自由にしたい
  * */
 
-export abstract class MarkerOperation {
-    constructor( private targetKey: string ){}
-    get target(): string { return this.targetKey; }
-    abstract execute( marker?: Leaflet.Marker ): Leaflet.Marker;
-}
-
-export class MarkerRemoveOperation extends MarkerOperation {
-    constructor( targetKey: string ){ super( targetKey ); }
-    execute( marker?: Leaflet.Marker ): Leaflet.Marker { return null; }
-}
-
-export class MarkerMoveOperation extends MarkerOperation {
-    constructor( targetKey: string, private lat: number, private lng: number, private option?: Leaflet.MapOptions ){
-        super( targetKey );
-    }
-    execute( marker?: Leaflet.Marker ): Leaflet.Marker {
-        if( marker ) {
-            return marker.setLatLng( [ this.lat, this.lng ] ); // 戻り値は this なので、新しいオブジェクトは作られない (Leaflet API)
-        } else {
-            return Leaflet.marker( [ this.lat, this.lng ], this.option );
-        }
-    }
-}
-
 // 効率を考えて、あえて配列を受け取るものとした
-export class MarkerLayer implements Observer<MarkerOperation[]> {
+export class Layer implements Observer<This.Operation[]> {
     private layer: Leaflet.LayerGroup;
     private markerMap: { [key:string]: Leaflet.Marker } = {};
     
@@ -48,10 +25,10 @@ export class MarkerLayer implements Observer<MarkerOperation[]> {
         return this.layer;
     }
     
-    constructor( private obs: Map.MarkerEvenetObservable ){
+    constructor( private obs: This.EventObservable ){
         this.layer = Leaflet.layerGroup([]);
     }
-    next( operations: MarkerOperation[] ): void {
+    next( operations: This.Operation[] ): void {
         let target: Leaflet.Marker;
         let result: Leaflet.Marker;
         let key: string;
