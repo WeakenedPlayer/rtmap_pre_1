@@ -19,6 +19,10 @@ const TileOption: Leaflet.TileLayerOptions = {
     noWrap: true
 };
 
+const MarkerOptions: Leaflet.MarkerOptions = {
+        draggable: true
+};
+
 const ContinentInfoList = [
     { id: 1, name: 'Indar', url: 'https://raw.githubusercontent.com/WeakenedPlayer/resource/master/map/indar/{z}/{y}/{x}.jpg'},
     { id: 2, name: 'Esamir', url: 'https://raw.githubusercontent.com/WeakenedPlayer/resource/master/map/esamir/{z}/{y}/{x}.jpg'},
@@ -36,10 +40,9 @@ class MyMapControl extends Map.Control {
         this.map.addLayer( this.tile );
         this.map.addLayer( this.markers.getLayerGroup() );
         
-        let operations = [ new Map.MarkerMoveOperation( '1', 0, 0 ),
-                           new Map.MarkerMoveOperation( '2', 0, 100 ),
-                           new Map.MarkerMoveOperation( '3', -100, 0 ),
-                           new Map.MarkerRemoveOperation( '2' ), ];
+        let operations = [ new Map.MarkerMoveOperation( '1', 0, 0, MarkerOptions),
+                           new Map.MarkerMoveOperation( '2', 0, 100, MarkerOptions ),
+                           new Map.MarkerMoveOperation( '3', -100, 0, MarkerOptions ),];
         
         Observable.of( operations ).subscribe( this.markers );
         this.obs.click$.subscribe( evt => { console.log( 'click ' + evt.key ) } );
@@ -47,7 +50,9 @@ class MyMapControl extends Map.Control {
         this.obs.mouseOver$.subscribe( evt => { console.log( 'mouse over ' + evt.key ) } );
         this.obs.mouseDown$.subscribe( evt => { console.log( 'mouse down ' + evt.key ) } );
         this.obs.mouseOut$.subscribe( evt => { console.log( 'mouse out ' + evt.key ) } );
-        this.obs.contextMenu$.subscribe( evt => { console.log( 'menu ' + evt.key ) } );
+        this.obs.dragStart$.subscribe( evt => { console.log( 'drag start ' + evt.key ) } );
+        this.obs.drag$.subscribe( evt => { console.log( 'drag ' + evt.key ) } );
+        this.obs.dragEnd$.subscribe( evt => { console.log( 'drag end ' + evt.key ) } );
     }
     
     protected mapOptions(): Leaflet.MapOptions {
