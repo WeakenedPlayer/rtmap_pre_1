@@ -5,7 +5,7 @@ class Event {
     constructor( public readonly key, public readonly: Leaflet.Event ){}
 }
 
-export class EventObservable {
+export class EventObservableSet {
     private clickSubject: Subject<Event> = new Subject();
     private doubleClickSubject: Subject<Event> = new Subject();
     private mouseDownSubject: Subject<Event> = new Subject();

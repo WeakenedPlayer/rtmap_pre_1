@@ -32,27 +32,26 @@ const ContinentInfoList = [
 
 class MyMapControl extends Map.Control {
     private tile: Leaflet.TileLayer;
-    private obs: Map.MarkerEvenetObservable = new Map.MarkerEvenetObservable();
-    private markers: Map.MarkerLayer = new Map.MarkerLayer( this.obs );
+    private markerLayer = new Map.MarkerSet.Layer();
     
     protected postMapCreated(): void {
         this.tile = Leaflet.tileLayer( ContinentInfoList[0].url, TileOption );
         this.map.addLayer( this.tile );
-        this.map.addLayer( this.markers.getLayerGroup() );
+        this.map.addLayer( this.markerLayer.getLayerGroup() );
         
-        let operations = [ new Map.MarkerMoveOperation( '1', 0, 0, MarkerOptions),
-                           new Map.MarkerMoveOperation( '2', 0, 100, MarkerOptions ),
-                           new Map.MarkerMoveOperation( '3', -100, 0, MarkerOptions ),];
+        let operations = [ new Map.MarkerSet.MoveOperation( '1', 0, 0, MarkerOptions),
+                           new Map.MarkerSet.MoveOperation( '2', 0, 100, MarkerOptions ),
+                           new Map.MarkerSet.MoveOperation( '3', -100, 0, MarkerOptions ),];
         
-        Observable.of( operations ).subscribe( this.markers );
-        this.obs.click$.subscribe( evt => { console.log( 'click ' + evt.key ) } );
-        this.obs.doubleClick$.subscribe( evt => { console.log( 'double click ' + evt.key ) } );
-        this.obs.mouseOver$.subscribe( evt => { console.log( 'mouse over ' + evt.key ) } );
-        this.obs.mouseDown$.subscribe( evt => { console.log( 'mouse down ' + evt.key ) } );
-        this.obs.mouseOut$.subscribe( evt => { console.log( 'mouse out ' + evt.key ) } );
-        this.obs.dragStart$.subscribe( evt => { console.log( 'drag start ' + evt.key ) } );
-        this.obs.drag$.subscribe( evt => { console.log( 'drag ' + evt.key ) } );
-        this.obs.dragEnd$.subscribe( evt => { console.log( 'drag end ' + evt.key ) } );
+        Observable.of( operations ).subscribe( this.markerLayer );
+        this.markerLayer.event.click$.subscribe( evt => { console.log( 'click ' + evt.key ) } );
+        this.markerLayer.event.doubleClick$.subscribe( evt => { console.log( 'double click ' + evt.key ) } );
+        this.markerLayer.event.mouseOver$.subscribe( evt => { console.log( 'mouse over ' + evt.key ) } );
+        this.markerLayer.event.mouseDown$.subscribe( evt => { console.log( 'mouse down ' + evt.key ) } );
+        this.markerLayer.event.mouseOut$.subscribe( evt => { console.log( 'mouse out ' + evt.key ) } );
+        this.markerLayer.event.dragStart$.subscribe( evt => { console.log( 'drag start ' + evt.key ) } );
+        this.markerLayer.event.drag$.subscribe( evt => { console.log( 'drag ' + evt.key ) } );
+        this.markerLayer.event.dragEnd$.subscribe( evt => { console.log( 'drag end ' + evt.key ) } );
     }
     
     protected mapOptions(): Leaflet.MapOptions {

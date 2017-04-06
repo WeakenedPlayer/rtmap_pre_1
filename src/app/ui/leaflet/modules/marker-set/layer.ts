@@ -19,10 +19,10 @@ import { MarkerSet } from './';
 // 効率を考えて、あえて配列を受け取るものとした
 export class Layer implements Observer<MarkerSet.Operation[]> {
     private layer: Leaflet.LayerGroup = Leaflet.layerGroup([]);
-    private eventObservable: MarkerSet.EventObservable = new MarkerSet.EventObservable();
+    private eventObservableSet: MarkerSet.EventObservableSet = new MarkerSet.EventObservableSet();
     private markerMap: { [key:string]: Leaflet.Marker } = {};
     
-    get markerEvent$(): MarkerSet.EventObservable { return this.eventObservable; }
+    get event(): MarkerSet.EventObservableSet { return this.eventObservableSet; }
     
     getLayerGroup(): Leaflet.LayerGroup {
         return this.layer;
@@ -54,7 +54,7 @@ export class Layer implements Observer<MarkerSet.Operation[]> {
                 // 新しく追加する場合
                 this.layer.addLayer( result );
                 this.markerMap[ key ] = result;
-                this.eventObservable.add( key, result );
+                this.eventObservableSet.add( key, result );
             }
         }
     }
