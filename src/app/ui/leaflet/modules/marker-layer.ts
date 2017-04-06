@@ -1,11 +1,19 @@
-import * as Leaflet from 'leaflet';
-import { Observer } from 'rxjs';
+import { Observer, Subject } from 'rxjs';
+import { Map, Leaflet } from '../';
 
+/*
 // marker observable
 // 既にあるものは移動し、消えたものは消すし、ないものは作る
 // それをどうするか
 // マーカー群をどう識別するかがポイント
 // 同一性は参照では定義できないのでキーになる
+ * クリックしてマーカを選んだらイベント開始、あとはトラッキング…という風にしたい。
+ * なので、すべてのマウスに対して同じObservableを作らせないといけない
+ * 全てのマーカにイベントをつける必要がある
+ * イベントObsは増やしたくない
+ * 追加は簡単にしたい
+ * 集約後は自由にしたい
+ * */
 
 export abstract class MarkerOperation {
     constructor( private targetKey: string ){}
@@ -31,8 +39,8 @@ export class MarkerMoveOperation extends MarkerOperation {
     }
 }
 
-
-export class MarkerObserver implements Observer<MarkerOperation[]> {
+// 効率を考えて、あえて配列を受け取るものとした
+export class MarkerLayer implements Observer<MarkerOperation[]> {
     private layer: Leaflet.LayerGroup;
     private markerMap: { [key:string]: Leaflet.Marker } = {};
     
@@ -40,7 +48,7 @@ export class MarkerObserver implements Observer<MarkerOperation[]> {
         return this.layer;
     }
     
-    constructor(){
+    constructor( private obs: Map.MarkerEvenetObservable ){
         this.layer = Leaflet.layerGroup([]);
     }
     next( operations: MarkerOperation[] ): void {
@@ -69,6 +77,7 @@ export class MarkerObserver implements Observer<MarkerOperation[]> {
                 // 新しく追加する場合
                 this.layer.addLayer( result );
                 this.markerMap[ key ] = result;
+                this.obs.add( key, result );
             }
         }
     }

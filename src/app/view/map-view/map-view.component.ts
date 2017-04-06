@@ -28,7 +28,8 @@ const ContinentInfoList = [
 
 class MyMapControl extends Map.Control {
     private tile: Leaflet.TileLayer;
-    private markers: Map.MarkerObserver = new Map.MarkerObserver();
+    private obs: Map.MarkerEvenetObservable = new Map.MarkerEvenetObservable();
+    private markers: Map.MarkerLayer = new Map.MarkerLayer( this.obs );
     
     protected postMapCreated(): void {
         this.tile = Leaflet.tileLayer( ContinentInfoList[0].url, TileOption );
@@ -38,10 +39,15 @@ class MyMapControl extends Map.Control {
         let operations = [ new Map.MarkerMoveOperation( '1', 0, 0 ),
                            new Map.MarkerMoveOperation( '2', 0, 100 ),
                            new Map.MarkerMoveOperation( '3', -100, 0 ),
-                           new Map.MarkerMoveOperation( '2', -200, 200 ),
-                           new Map.MarkerMoveOperation( '3', -200, 100 ) ];
+                           new Map.MarkerRemoveOperation( '2' ), ];
         
         Observable.of( operations ).subscribe( this.markers );
+        this.obs.click$.subscribe( evt => { console.log( 'click ' + evt.key ) } );
+        this.obs.doubleClick$.subscribe( evt => { console.log( 'double click ' + evt.key ) } );
+        this.obs.mouseOver$.subscribe( evt => { console.log( 'mouse over ' + evt.key ) } );
+        this.obs.mouseDown$.subscribe( evt => { console.log( 'mouse down ' + evt.key ) } );
+        this.obs.mouseOut$.subscribe( evt => { console.log( 'mouse out ' + evt.key ) } );
+        this.obs.contextMenu$.subscribe( evt => { console.log( 'menu ' + evt.key ) } );
     }
     
     protected mapOptions(): Leaflet.MapOptions {
