@@ -50,7 +50,12 @@ export abstract class SimpleMapper<T> implements DB.Mapper<T> {
     // --------------------------------------------------------------------------------------------
     getDb( keys?: any ): Observable<T> {
         return this.mapper.get( keys ).map( dbData => {
-            return this.db2obj( dbData.keys, dbData.values );                
+            // 存在しなければ null
+            if( dbData.values.$exists() ) {
+                return this.db2obj( dbData.keys, dbData.values );
+            } else {
+                return null;
+            }
         } );
     }
 
@@ -63,6 +68,7 @@ export abstract class SimpleMapper<T> implements DB.Mapper<T> {
             dbData.values.forEach( ( value, index ) => {
                 result[ index ] = this.db2obj( dbData.keys, value );
             } );
+            // 存在しなければ空配列
             return result;
         } );
     }

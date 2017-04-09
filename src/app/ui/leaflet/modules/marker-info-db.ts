@@ -30,6 +30,7 @@ export class MarkerInfoDB extends DB.SimpleMapper<This.MarkerInfo>{
     // 更新されたものだけ抽出する
     getChanges( keys?: any ): Observable<This.Change[]> {
         return this.getAllDb( keys ).map( markers => {
+            //console.log( markers );
             let changes: This.Change[] = [];
             for( let marker of markers ) {
                 let key = marker.key;

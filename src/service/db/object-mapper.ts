@@ -39,7 +39,7 @@ export class ObjectMapper {
         let url = this.path.toUrl( keys );
         let observable: Observable<any> = this.af.database.object( url ) as Observable<any>;
         return observable.map( data => {
-            console.log( data );
+            //console.log( data );
             return new DB.DbData( keys, data );
         } );
     }

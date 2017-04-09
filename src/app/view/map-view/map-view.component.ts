@@ -91,10 +91,8 @@ export class MapViewComponent implements OnInit {
     constructor( private af: AngularFire, private location: Location, private router: Router ) {
         this.mapControl = new MyMapControl();
         this.db = new Map.MarkerInfoDB( af, DB.Path.fromUrl( '/map/marker' ) );
-        
-        this.db.getChanges().subscribe( res => console.log(res) );
-        
-        this.db.push( 10, -50, 1 ); 
+        this.db.push( -10, 20, 1 );
+        this.db.get('-KhHsUhHYAN82hGgJjgA').do( co => console.log( co ) ).subscribe();
         this.db.getChanges().do( changes => {
             this.mapControl.applyChanges( changes );
         } ).subscribe();
