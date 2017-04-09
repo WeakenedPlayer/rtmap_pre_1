@@ -5,7 +5,7 @@
 
 export class Path {
     private paramIndex: { [key:string]: number } = {};
-    
+    private keys: string[];
     /* --------------------------------------------------------------------------------------------
      * url(文字列）からPathを作る
      * ----------------------------------------------------------------------------------------- */
@@ -22,7 +22,9 @@ export class Path {
     /* --------------------------------------------------------------------------------------------
      * 生成・変換
      * ----------------------------------------------------------------------------------------- */
-    constructor( private keys: string[] ) {
+    constructor( keys: string[] ) {
+        // 値をコピーすること。参照をコピーするとトラブルになる。
+        this.keys = [].concat( keys );
         this.keys.forEach( ( key, index ) => {
             // パラメータの場合
             if( key[0] === '$' ) {
@@ -43,8 +45,7 @@ export class Path {
             // absolute 
             return path.clone();
         } else {
-            let tmp = this.keys.concat( [] );
-            
+            let tmp = [].concat( this.keys );
             path.keys.forEach( (key,index) => {
                 if( key === '..' ) {
                     tmp.pop();

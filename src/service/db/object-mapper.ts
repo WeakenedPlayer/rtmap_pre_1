@@ -9,7 +9,8 @@ import { DB } from './index';
  * 格納対象をキーと本体に分解
  * ################################################################################################################# */
 export class ObjectMapper {
-    constructor( private af: AngularFire, private path: DB.Path ) {}
+    constructor( private af: AngularFire, private path: DB.Path ) {
+    }
 
     // --------------------------------------------------------------------------------------------
     // オブジェクトを元にDBに格納するオブジェクトを作成する
