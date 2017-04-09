@@ -19,20 +19,21 @@ export class MarkerInfoDB extends DB.SimpleMapper<This.MarkerInfo>{
     }
     
     db2obj( keys: any, values: any ): This.MarkerInfo {
-        //console.log( values );
-        return new This.MarkerInfo( values.$key, values.$exist, values.t, values.lat, values.lng, values.i );
+        return new This.MarkerInfo( values.$key, values.$exists(), values.t, values.lat, values.lng, values.i );
     }
 
     // 更新されたものだけ抽出する
-    getChanges( keys?: any ): Observable<This.Changes[]> {
+    getChanges( keys?: any ): Observable<This.Change[]> {
         return this.getAllDb( keys ).map( markers => {
-            let changes: This.Changes[] = [];
+            let changes: This.Change[] = [];
+        console.log( markers );
             for( let marker of markers ) {
                 let key = marker.key;
                 let oldMarker: This.MarkerInfo = this.latestInfo[ key ];
                 
-                if( !oldMarker || oldMarker.ts != marker.ts ) {
-                    changes.push( new This.Changes( marker, oldMarker ) );
+
+                if( !oldMarker || oldMarker.ts != marker.ts || !marker.exists ) {
+                    changes.push( new This.Change( marker, oldMarker ) );
                     this.latestInfo[ key ] = marker;
                 }
             }

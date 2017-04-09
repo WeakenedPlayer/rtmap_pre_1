@@ -35,17 +35,11 @@ export class ObjectMapper {
     // complete を発行しないので、利用者が止めること。
     // --------------------------------------------------------------------------------------------
     get( keys?: any ): Observable<DB.DbData> {
-        return Observable.create( ( subscriber: Subscriber<DB.DbData>　) => {
-            let url = this.path.toUrl( keys );
-            // console.log( keys );
-            // console.log( url );
-            let observable = this.af.database.object( url );
-            let subscription = observable.subscribe( data => {
-                subscriber.next( new DB.DbData( keys, data ) );
-            },
-            (err) => {},
-            () => {} );
-            return subscription;
+        let url = this.path.toUrl( keys );
+        let observable: Observable<DB.DbData> = this.af.database.object( url ) as Observable<DB.DbData>;
+        return observable.map( data => {
+            console.log( data );
+            return new DB.DbData( keys, data ); 
         } );
     }
 
@@ -53,17 +47,11 @@ export class ObjectMapper {
     // オブジェクトを取得する(同階層すべて)
     // --------------------------------------------------------------------------------------------
     getAll( keys?: any ): Observable<DB.DbData> {
-        return Observable.create( ( subscriber: Subscriber<DB.DbData> ) => {
-            let url = this.path.getParent().toUrl( keys );
-            
-            let observable = this.af.database.list( url ) as Observable<any[]>;
-            let subscription = observable.subscribe( data => {
-                subscriber.next( new DB.DbData( keys, data) );
-            },
-            (err) => {},
-            () => {} );
-        
-        return subscription;
+        let url = this.path.getParent().toUrl( keys );
+        let observable: Observable<DB.DbData> = this.af.database.list( url ) as Observable<any[]>;
+        return observable.map( data => {
+            console.log( data );
+            return new DB.DbData( keys, data ); 
         } );
     }
     
@@ -73,7 +61,6 @@ export class ObjectMapper {
     set( object: any ): Promise<void> {
         let dbObject = this.toDbObject( object );
 
-        console.log( dbObject );
         let ref = this.af.database.object( this.path.toUrl( object ) );
         return ref.set( dbObject ) as Promise<void>;
     }

@@ -9,6 +9,6 @@ export class MarkerInfo {
             ) {}
 }
 
-export class Changes {
+export class Change {
     constructor( public newValue: MarkerInfo, public oldValue: MarkerInfo ) {}
 }

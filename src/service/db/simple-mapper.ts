@@ -52,13 +52,9 @@ export abstract class SimpleMapper<T> implements DB.Mapper<T> {
         // console.log( keys );
         return Observable.create( ( subscriber: Subscriber<T> ) => {
             let subscription = this.mapper.get( keys ).subscribe( ( dbData ) => {
+                // null を返さない。 exists()で判断する。
                 let result: T;
-                if( dbData.values.$exists() ) {
-                    result = this.db2obj( dbData.keys, dbData.values );
-                } else {
-                    // Subscribeしていたデータが消滅したら null にする
-                    result = null;
-                }
+                result = this.db2obj( dbData.keys, dbData.values );
                 subscriber.next( result );
             },
             (err)=>{},
@@ -76,11 +72,8 @@ export abstract class SimpleMapper<T> implements DB.Mapper<T> {
             let subscription = this.mapper.getAll( keys ).subscribe( ( dbData ) => {
                 let result = Array<T>( dbData.values.length );
                 dbData.values.forEach( ( value, index ) => {
-                    if( value.$exists ) {
-                        result[ index ] = this.db2obj( dbData.keys, value );
-                    } else { 
-                        result[ index ] = null;
-                    }
+                    // exists の処置は
+                    result[ index ] = this.db2obj( dbData.keys, value );
                 } );
                 subscriber.next( result );
             },

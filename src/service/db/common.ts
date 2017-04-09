@@ -6,7 +6,7 @@ export const TimeStamp = firebase.database.ServerValue.TIMESTAMP;
  * DBからのデータとそれ以外をまとめた、データの復元に必要な情報一式
  * ################################################################################################################# */
 export class DbData {
-    constructor( public readonly keys: any, public readonly values: any ) {
+    constructor( public readonly keys: any, public readonly values: any, public exists?:boolean ) {
     }
 }
 

@@ -32,29 +32,32 @@ const ContinentInfoList = [
     { id: 4, name: 'Hossin', url: 'https://raw.githubusercontent.com/WeakenedPlayer/resource/master/map/hossin/{z}/{y}/{x}.jpg'}
 ];
 
+/*
+     this.map.addLayer( this.markerLayer.getLayerGroup() );
+     
+     let operations = [ new Map.MarkerSet.MoveOperation( '1', 0, 0, MarkerOptions),
+                        new Map.MarkerSet.MoveOperation( '2', 0, 100, MarkerOptions ),
+                        new Map.MarkerSet.MoveOperation( '3', -100, 0, MarkerOptions ),];
+     
+     Observable.of( operations ).subscribe( this.markerLayer );
+     this.markerLayer.event.click$.subscribe( info => { console.log('click ' + info.key ) } );
+     this.markerLayer.event.doubleClick$.subscribe( info => { console.log( 'double click ' + info.key ) } );
+     this.markerLayer.event.mouseOver$.subscribe( info => { console.log( 'mouse over ' + info.key ) } );
+     this.markerLayer.event.mouseDown$.subscribe( info => { console.log( 'mouse down ' + info.key ) } );
+     this.markerLayer.event.mouseOut$.subscribe( info => { console.log( 'mouse out ' + info.key ) } );
+     this.markerLayer.event.dragStart$.subscribe( info => { console.log( 'drag start ' + info.key ) } );
+     this.markerLayer.event.drag$.subscribe( info => { console.log( 'drag ' + info.key ) } );
+     this.markerLayer.event.dragEnd$.subscribe( info => { console.log( 'drag end ' + info.key ) } );*/
+
+
 class MyMapControl extends Map.Control {
     private tile: Leaflet.TileLayer;
+    private markers: Leaflet.LayerGroup;
     // private markerLayer = new Map.MarkerSet.Layer();
     
     protected postMapCreated(): void {
         this.tile = Leaflet.tileLayer( ContinentInfoList[0].url, TileOption );
         this.map.addLayer( this.tile );
-   /*
-        this.map.addLayer( this.markerLayer.getLayerGroup() );
-        
-        let operations = [ new Map.MarkerSet.MoveOperation( '1', 0, 0, MarkerOptions),
-                           new Map.MarkerSet.MoveOperation( '2', 0, 100, MarkerOptions ),
-                           new Map.MarkerSet.MoveOperation( '3', -100, 0, MarkerOptions ),];
-        
-        Observable.of( operations ).subscribe( this.markerLayer );
-        this.markerLayer.event.click$.subscribe( info => { console.log('click ' + info.key ) } );
-        this.markerLayer.event.doubleClick$.subscribe( info => { console.log( 'double click ' + info.key ) } );
-        this.markerLayer.event.mouseOver$.subscribe( info => { console.log( 'mouse over ' + info.key ) } );
-        this.markerLayer.event.mouseDown$.subscribe( info => { console.log( 'mouse down ' + info.key ) } );
-        this.markerLayer.event.mouseOut$.subscribe( info => { console.log( 'mouse out ' + info.key ) } );
-        this.markerLayer.event.dragStart$.subscribe( info => { console.log( 'drag start ' + info.key ) } );
-        this.markerLayer.event.drag$.subscribe( info => { console.log( 'drag ' + info.key ) } );
-        this.markerLayer.event.dragEnd$.subscribe( info => { console.log( 'drag end ' + info.key ) } );*/
     }
     
     protected mapOptions(): Leaflet.MapOptions {
@@ -63,6 +66,16 @@ class MyMapControl extends Map.Control {
 
     constructor() {
         super();
+    }
+    
+    applyChanges( changes: Map.Change[] ) {
+        for( let change of changes ) {
+            if( !change.oldValue ) {
+                let marker = Leaflet.marker( [ change.newValue.lat, change.newValue.lng ] );
+                this.map.addLayer( marker );
+            }
+
+        }
     }
 }
 
@@ -78,9 +91,11 @@ export class MapViewComponent implements OnInit {
     constructor( private af: AngularFire, private location: Location, private router: Router ) {
         this.mapControl = new MyMapControl();
         this.db = new Map.MarkerInfoDB( af, DB.Path.fromUrl( '/map/marker' ) );
-        
-        // this.db.push( 10, 10, 1 ).then( key => { console.log( key ) } );
-        this.db.getChanges().map( changes => console.log( changes ) ).subscribe();
+
+        this.db.push( 10, 10, 1 ).then( key => { console.log( key ) } );
+        this.db.getChanges().do( changes => {
+            this.mapControl.applyChanges( changes );
+        } ).subscribe();
     }
 
     ngOnInit() {
