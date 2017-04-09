@@ -36,7 +36,7 @@ export class ObjectMapper {
     // --------------------------------------------------------------------------------------------
     get( keys?: any ): Observable<DB.DbData> {
         let url = this.path.toUrl( keys );
-        let observable: Observable<DB.DbData> = this.af.database.object( url ) as Observable<DB.DbData>;
+        let observable: Observable<any> = this.af.database.object( url ) as Observable<any>;
         return observable.map( data => {
             console.log( data );
             return new DB.DbData( keys, data ); 
@@ -48,10 +48,8 @@ export class ObjectMapper {
     // --------------------------------------------------------------------------------------------
     getAll( keys?: any ): Observable<DB.DbData> {
         let url = this.path.getParent().toUrl( keys );
-        let observable: Observable<DB.DbData> = this.af.database.list( url ) as Observable<any[]>;
-        return observable.map( data => {
-            console.log( data );
-            return new DB.DbData( keys, data ); 
+        return this.af.database.list( url ).map( data => {
+            return new DB.DbData( keys, data );
         } );
     }
     
@@ -82,8 +80,8 @@ export class ObjectMapper {
     // --------------------------------------------------------------------------------------------
     push( object: any ): Promise<any> {
         let dbObject = this.toDbObject( object );
-
         let ref = this.af.database.list( this.path.getParent().toUrl( object ) );
+        
         return new Promise( ( resolve ) => {
             ref.push( dbObject ).then( ( result )=>{ resolve( result ); } );
         } );

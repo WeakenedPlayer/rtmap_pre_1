@@ -48,18 +48,9 @@ export abstract class SimpleMapper<T> implements DB.Mapper<T> {
     // キーとDBから取得した値を用いて読み出す
     // --------------------------------------------------------------------------------------------
     getDb( keys?: any ): Observable<T> {
-        // materialize を防ぐため、map は使わず、必要な処理を一つのObservableで実行する。
-        // console.log( keys );
-        return Observable.create( ( subscriber: Subscriber<T> ) => {
-            let subscription = this.mapper.get( keys ).subscribe( ( dbData ) => {
-                // null を返さない。 exists()で判断する。
-                let result: T;
-                result = this.db2obj( dbData.keys, dbData.values );
-                subscriber.next( result );
-            },
-            (err)=>{},
-            ()=>{} );
-            return subscription;
+        return this.mapper.get( keys ).map( dbData => {
+            // データが存在しない場合はここに来ない
+            return this.db2obj( dbData.keys, dbData.values );                
         } );
     }
 
@@ -67,19 +58,13 @@ export abstract class SimpleMapper<T> implements DB.Mapper<T> {
     // C[R]UD
     // --------------------------------------------------------------------------------------------
     getAllDb( keys?: any ): Observable<T[]>  {
-        // materialize を防ぐため、map は使わず、必要な処理を一つのObservableで実行する。
-        return Observable.create( ( subscriber: Subscriber<T[]> ) => {
-            let subscription = this.mapper.getAll( keys ).subscribe( ( dbData ) => {
-                let result = Array<T>( dbData.values.length );
-                dbData.values.forEach( ( value, index ) => {
-                    // exists の処置は
-                    result[ index ] = this.db2obj( dbData.keys, value );
-                } );
-                subscriber.next( result );
-            },
-            (err)=>{},
-            ()=>{} );
-            return subscription;
+        return this.mapper.getAll( keys ).map( dbData => {
+            // データが存在しない場合はここに来ない
+            let result = Array<T>( dbData.values.length );
+            dbData.values.forEach( ( value, index ) => {
+                result[ index ] = this.db2obj( dbData.keys, value );
+            } );
+            return result;
         } );
     }
 

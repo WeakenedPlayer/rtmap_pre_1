@@ -19,20 +19,24 @@ export class MarkerInfoDB extends DB.SimpleMapper<This.MarkerInfo>{
     }
     
     db2obj( keys: any, values: any ): This.MarkerInfo {
-        return new This.MarkerInfo( values.$key, values.$exists(), values.t, values.lat, values.lng, values.i );
+        // 存在が消えたことは判断できない(配列の場合、配列全体に対してExistsが適用される)
+        return new This.MarkerInfo( values.$key, values.t, values.lat, values.lng, values.i );
     }
 
+    get( key: string ): Observable<This.MarkerInfo> {
+        return this.getDb( { key: key } );
+    } 
+    
     // 更新されたものだけ抽出する
     getChanges( keys?: any ): Observable<This.Change[]> {
         return this.getAllDb( keys ).map( markers => {
             let changes: This.Change[] = [];
-        console.log( markers );
             for( let marker of markers ) {
                 let key = marker.key;
                 let oldMarker: This.MarkerInfo = this.latestInfo[ key ];
                 
 
-                if( !oldMarker || oldMarker.ts != marker.ts || !marker.exists ) {
+                if( !oldMarker || oldMarker.ts != marker.ts ) {
                     changes.push( new This.Change( marker, oldMarker ) );
                     this.latestInfo[ key ] = marker;
                 }

@@ -1,7 +1,6 @@
 export class MarkerInfo {
     constructor(
             public readonly key: string,
-            public readonly exists: boolean,
             public readonly ts: number,
             public lat: number,
             public lng: number,
