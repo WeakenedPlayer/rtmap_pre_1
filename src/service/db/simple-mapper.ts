@@ -38,10 +38,8 @@ export abstract class SimpleMapper<T> implements DB.Mapper<T> {
     // [C]RUD
     // --------------------------------------------------------------------------------------------
     protected pushDb( obj: any ): Promise<string> {
-        return new Promise( ( resolve ) => {
-            this.mapper.push( obj ).then( result => {
-                resolve( ( result.$exists() )? result.key : null );
-            } );
+        return this.mapper.push( obj ).then( reference => {
+            return Promise.resolve( reference.key );
         } );
     }
 
@@ -96,7 +94,6 @@ export abstract class SimpleMapper<T> implements DB.Mapper<T> {
     // オブジェクトを渡して、DBの値を一部上書きする(タイムスタンプを上書きから除外したい場合を想定)
     // --------------------------------------------------------------------------------------------
     protected updateDb( obj?: any ): Promise<void> {
-        // console.log( obj );
         return this.mapper.update( obj );
     }
 

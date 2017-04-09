@@ -3,6 +3,8 @@ import { Location } from '@angular/common';
 import { Router } from '@angular/router';
 import { Leaflet, Map } from '../../ui';
 import { Observable } from 'rxjs';
+import { AngularFire } from 'angularfire2';;
+import { DB } from 'service';
 
 const MapOption: Leaflet.MapOptions = {
         crs: Leaflet.CRS.Simple,
@@ -32,11 +34,12 @@ const ContinentInfoList = [
 
 class MyMapControl extends Map.Control {
     private tile: Leaflet.TileLayer;
-    private markerLayer = new Map.MarkerSet.Layer();
+    // private markerLayer = new Map.MarkerSet.Layer();
     
     protected postMapCreated(): void {
         this.tile = Leaflet.tileLayer( ContinentInfoList[0].url, TileOption );
         this.map.addLayer( this.tile );
+   /*
         this.map.addLayer( this.markerLayer.getLayerGroup() );
         
         let operations = [ new Map.MarkerSet.MoveOperation( '1', 0, 0, MarkerOptions),
@@ -44,14 +47,14 @@ class MyMapControl extends Map.Control {
                            new Map.MarkerSet.MoveOperation( '3', -100, 0, MarkerOptions ),];
         
         Observable.of( operations ).subscribe( this.markerLayer );
-        this.markerLayer.event.click$.subscribe( evt => { console.log( 'click ' + evt.key ) } );
-        this.markerLayer.event.doubleClick$.subscribe( evt => { console.log( 'double click ' + evt.key ) } );
-        this.markerLayer.event.mouseOver$.subscribe( evt => { console.log( 'mouse over ' + evt.key ) } );
-        this.markerLayer.event.mouseDown$.subscribe( evt => { console.log( 'mouse down ' + evt.key ) } );
-        this.markerLayer.event.mouseOut$.subscribe( evt => { console.log( 'mouse out ' + evt.key ) } );
-        this.markerLayer.event.dragStart$.subscribe( evt => { console.log( 'drag start ' + evt.key ) } );
-        this.markerLayer.event.drag$.subscribe( evt => { console.log( 'drag ' + evt.key ) } );
-        this.markerLayer.event.dragEnd$.subscribe( evt => { console.log( 'drag end ' + evt.key ) } );
+        this.markerLayer.event.click$.subscribe( info => { console.log('click ' + info.key ) } );
+        this.markerLayer.event.doubleClick$.subscribe( info => { console.log( 'double click ' + info.key ) } );
+        this.markerLayer.event.mouseOver$.subscribe( info => { console.log( 'mouse over ' + info.key ) } );
+        this.markerLayer.event.mouseDown$.subscribe( info => { console.log( 'mouse down ' + info.key ) } );
+        this.markerLayer.event.mouseOut$.subscribe( info => { console.log( 'mouse out ' + info.key ) } );
+        this.markerLayer.event.dragStart$.subscribe( info => { console.log( 'drag start ' + info.key ) } );
+        this.markerLayer.event.drag$.subscribe( info => { console.log( 'drag ' + info.key ) } );
+        this.markerLayer.event.dragEnd$.subscribe( info => { console.log( 'drag end ' + info.key ) } );*/
     }
     
     protected mapOptions(): Leaflet.MapOptions {
@@ -71,8 +74,12 @@ class MyMapControl extends Map.Control {
 })
 export class MapViewComponent implements OnInit {
     mapControl: MyMapControl;
-    constructor( private location: Location, private router: Router ) {
+    db: Map.MarkerInfoDB;
+    constructor( private af: AngularFire, private location: Location, private router: Router ) {
         this.mapControl = new MyMapControl();
+        this.db = new Map.MarkerInfoDB( af, DB.Path.fromUrl( '/map/marker' ) );
+        
+        this.db.push( 10, 10, 1 ).then( key => { console.log( key ) } );
     }
 
     ngOnInit() {
