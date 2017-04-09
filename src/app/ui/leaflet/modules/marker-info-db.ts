@@ -15,7 +15,7 @@ export class MarkerInfoDB extends DB.SimpleMapper<This.MarkerInfo>{
     private latestInfo: { [key:string]: This.MarkerInfo } = {};
 
     constructor( af: AngularFire, path: DB.Path ){
-        super( af, path.move( DB.Path.fromUrl('$key') ) );        
+        super( af, path.move( DB.Path.fromUrl('$key') ) );
     }
     
     db2obj( keys: any, values: any ): This.MarkerInfo {

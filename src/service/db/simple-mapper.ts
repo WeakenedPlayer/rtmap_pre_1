@@ -16,9 +16,10 @@ export abstract class SimpleMapper<T> implements DB.Mapper<T> {
 
     // --------------------------------------------------------------------------------------------
     // キーとDBから取得した値を用いて値を復元する
+    // values には、firebaseの結果が入っている
+    // $value が空なら、そのデータは存在しないことになる。
     // --------------------------------------------------------------------------------------------
     protected abstract db2obj( keys: any, values: any ): T;
-
     // --------------------------------------------------------------------------------------------
     // 補助関数
     // --------------------------------------------------------------------------------------------
@@ -49,7 +50,6 @@ export abstract class SimpleMapper<T> implements DB.Mapper<T> {
     // --------------------------------------------------------------------------------------------
     getDb( keys?: any ): Observable<T> {
         return this.mapper.get( keys ).map( dbData => {
-            // データが存在しない場合はここに来ない
             return this.db2obj( dbData.keys, dbData.values );                
         } );
     }
@@ -59,7 +59,6 @@ export abstract class SimpleMapper<T> implements DB.Mapper<T> {
     // --------------------------------------------------------------------------------------------
     getAllDb( keys?: any ): Observable<T[]>  {
         return this.mapper.getAll( keys ).map( dbData => {
-            // データが存在しない場合はここに来ない
             let result = Array<T>( dbData.values.length );
             dbData.values.forEach( ( value, index ) => {
                 result[ index ] = this.db2obj( dbData.keys, value );

@@ -92,7 +92,8 @@ export class MapViewComponent implements OnInit {
         this.mapControl = new MyMapControl();
         this.db = new Map.MarkerInfoDB( af, DB.Path.fromUrl( '/map/marker' ) );
         
-        this.db.get( '-KhHnNmNr6TTw4CYMdaW' );
+        
+        this.db.push( 10, -50, 1 ); 
         this.db.getChanges().do( changes => {
             this.mapControl.applyChanges( changes );
         } ).subscribe();
