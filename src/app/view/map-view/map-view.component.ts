@@ -79,7 +79,8 @@ export class MapViewComponent implements OnInit {
         this.mapControl = new MyMapControl();
         this.db = new Map.MarkerInfoDB( af, DB.Path.fromUrl( '/map/marker' ) );
         
-        this.db.push( 10, 10, 1 ).then( key => { console.log( key ) } );
+        // this.db.push( 10, 10, 1 ).then( key => { console.log( key ) } );
+        this.db.getChanges().map( changes => console.log( changes ) ).subscribe();
     }
 
     ngOnInit() {

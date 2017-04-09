@@ -19,7 +19,7 @@ export class MarkerInfoDB extends DB.SimpleMapper<This.MarkerInfo>{
     }
     
     db2obj( keys: any, values: any ): This.MarkerInfo {
-        console.log( values );
+        //console.log( values );
         return new This.MarkerInfo( values.$key, values.$exist, values.t, values.lat, values.lng, values.i );
     }
 
