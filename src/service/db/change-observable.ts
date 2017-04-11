@@ -14,9 +14,9 @@ export class ChangeObservable{
                         keyOf: ( obj: T ) => string | number,
                         signatureOf: ( obj: T ) => string | number ): Observable<T[]>{
         let signatures: { [key:string]: string | number } = {};
+        let newSignatures: { [key:string]: string | number } = {};
         return obs.map( array => {
             let modifiedObjects: T[] = [];
-            let newSignatures: { [key:string]: string | number } = {};
             
             for( let obj of array ) {
                 let signature = signatureOf( obj );
@@ -35,16 +35,17 @@ export class ChangeObservable{
             if( modifiedObjects ) {
                 return modifiedObjects;
             }
-        } ).filter( result => result.length > 0 );
+        } );
+//      } ).filter( result => result.length > 0 );
     }
         
     static added<T>( obs: Observable<T[]>,
                      keyOf: ( obj: T ) => string | number ): Observable<T[]>{
         let keys: { [key:string]: boolean } = {};
+        let newKeys: { [key:string]: boolean } = {};
                          
         return obs.map( array => {
             let newObjects: T[] = [];
-            let newKeys: { [key:string]: boolean } = {};
 
             for( let obj of array ) {
                 let key = keyOf( obj );
@@ -55,21 +56,22 @@ export class ChangeObservable{
                     newObjects.push( obj );
                 }
             }
-            
+            console.log( keys );
             keys = newKeys;
             if( newObjects ) {
                 return newObjects;
             }
-        } ).filter( result => result.length > 0 );
+        } );
+//      } ).filter( result => result.length > 0 );
     }
 
     static removed<T>( obs: Observable<T[]>,
                        keyOf: ( obj: T ) => string | number ): Observable<string[]>{
     let keys: { [key:string]: boolean } = {};
+    let newKeys: { [key:string]: boolean } = {};
                      
     return obs.map( array => {
         let removedKeys: string[] = [];
-        let newKeys: { [key:string]: boolean } = {};
 
         for( let obj of array ) {
             let key = keyOf( obj );
@@ -84,7 +86,8 @@ export class ChangeObservable{
         if( removedKeys ) {
             return removedKeys;
         }
-    } ).filter( result => result.length > 0 );
+    } );
+//    } ).filter( result => result.length > 0 );
 }
 }
 

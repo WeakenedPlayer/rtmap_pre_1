@@ -32,44 +32,57 @@ const ContinentInfoList = [
     { id: 4, name: 'Hossin', url: 'https://raw.githubusercontent.com/WeakenedPlayer/resource/master/map/hossin/{z}/{y}/{x}.jpg'}
 ];
 
-/*
-     this.map.addLayer( this.markerLayer.getLayerGroup() );
-     
-     let operations = [ new Map.MarkerSet.MoveOperation( '1', 0, 0, MarkerOptions),
-                        new Map.MarkerSet.MoveOperation( '2', 0, 100, MarkerOptions ),
-                        new Map.MarkerSet.MoveOperation( '3', -100, 0, MarkerOptions ),];
-     
-     Observable.of( operations ).subscribe( this.markerLayer );
-     this.markerLayer.event.click$.subscribe( info => { console.log('click ' + info.key ) } );
-     this.markerLayer.event.doubleClick$.subscribe( info => { console.log( 'double click ' + info.key ) } );
-     this.markerLayer.event.mouseOver$.subscribe( info => { console.log( 'mouse over ' + info.key ) } );
-     this.markerLayer.event.mouseDown$.subscribe( info => { console.log( 'mouse down ' + info.key ) } );
-     this.markerLayer.event.mouseOut$.subscribe( info => { console.log( 'mouse out ' + info.key ) } );
-     this.markerLayer.event.dragStart$.subscribe( info => { console.log( 'drag start ' + info.key ) } );
-     this.markerLayer.event.drag$.subscribe( info => { console.log( 'drag ' + info.key ) } );
-     this.markerLayer.event.dragEnd$.subscribe( info => { console.log( 'drag end ' + info.key ) } );*/
 
 
 class MyMapControl extends Map.Control {
+    db: Map.MarkerInfoDB;
     private tile: Leaflet.TileLayer;
-    private markers: Leaflet.LayerGroup;
-    // private markerLayer = new Map.MarkerSet.Layer();
+    private layer: Leaflet.LayerGroup;
+    private markers: { [key: string]: Leaflet.Marker } = {};
     
     protected postMapCreated(): void {
         this.tile = Leaflet.tileLayer( ContinentInfoList[0].url, TileOption );
         this.map.addLayer( this.tile );
+        this.map.addLayer( this.layer );
     }
     
     protected mapOptions(): Leaflet.MapOptions {
         return MapOption;
     }
 
-    constructor() {
+    constructor( private af: AngularFire ) {
         super();
+        this.layer = Leaflet.layerGroup([]);
+        this.db = new Map.MarkerInfoDB( af, DB.Path.fromUrl( '/map/marker' ) );
+        let obs = this.db.getAll().publishReplay(1).refCount();
+        let modified = DB.ChangeObservable.modified<Map.MarkerInfo>( obs, ( obj )=> obj.key, ( obj )=> obj.ts ).do( markers => {
+            console.log( 'mod' );
+            console.log( markers );
+             for( let marker of markers ) {
+                 this.markers[ marker.key ].setLatLng( [ marker.lat, marker.lng ] );
+             }
+        } ).subscribe();
+        console.log( 'test');
+        let added = DB.ChangeObservable.added<Map.MarkerInfo>( obs, ( obj )=> obj.key ).do( markers => {
+            console.log( 'add' );
+            console.log( markers );
+            for( let marker of markers ) {
+                let m = Leaflet.marker( [ marker.lat, marker.lng ] );
+                this.markers[ marker.key ] = m;
+                this.layer.addLayer( m );
+            }
+        } ).subscribe();
+        let removed = DB.ChangeObservable.removed<Map.MarkerInfo>( obs, ( obj )=> obj.key ).do( keys => {
+            for( let key of keys ) {
+                console.log( key );
+                this.markers[ key ].remove();
+            }
+        } ).subscribe();
+//        Observable.concat( [ added, removed ] ).subscribe();
+        this.db.push( - Math.random() * 100 - 100, Math.random() * 100 + 100, 9 );
     }
     
-    applyChanges( changes: { [key:string]: Map.Change } ) {
-    }
+    
 }
 
 
@@ -80,15 +93,8 @@ class MyMapControl extends Map.Control {
 })
 export class MapViewComponent implements OnInit {
     mapControl: MyMapControl;
-    db: Map.MarkerInfoDB;
     constructor( private af: AngularFire, private location: Location, private router: Router ) {
-        this.mapControl = new MyMapControl();
-        this.db = new Map.MarkerInfoDB( af, DB.Path.fromUrl( '/map/marker' ) );
-        let obs = this.db.getAll().publishReplay(1).refCount();
-
-        DB.ChangeObservable.modified<Map.MarkerInfo>( obs, ( obj )=> obj.key, ( obj )=> obj.ts ).subscribe( changed => console.log( changed ) );  
-        DB.ChangeObservable.added<Map.MarkerInfo>( obs, ( obj )=> obj.key ).subscribe( changed => console.log( changed ) );  
-        DB.ChangeObservable.removed<Map.MarkerInfo>( obs, ( obj )=> obj.key ).subscribe( changed => console.log( changed ) );  
+        this.mapControl = new MyMapControl( af );
     }
 
     ngOnInit() {
