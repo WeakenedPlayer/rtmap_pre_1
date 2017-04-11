@@ -10,7 +10,7 @@ import * as This from './modules';
 // lat : 
 // i   : icon
 // t   : time stamp
-
+// 効率が悪い。配列の変化は一度に1つだけ。
 export class MarkerInfoDB extends DB.SimpleMapper<This.MarkerInfo>{
     private latestInfo: { [key:string]: This.MarkerInfo } = {};
 
@@ -26,26 +26,11 @@ export class MarkerInfoDB extends DB.SimpleMapper<This.MarkerInfo>{
     get( key: string ): Observable<This.MarkerInfo> {
         return this.getDb( { key: key } );
     } 
-    
-    // 更新されたものだけ抽出する
-    getChanges( keys?: any ): Observable<This.Change[]> {
-        return this.getAllDb( keys ).map( markers => {
-            //console.log( markers );
-            let changes: This.Change[] = [];
-            for( let marker of markers ) {
-                let key = marker.key;
-                let oldMarker: This.MarkerInfo = this.latestInfo[ key ];
-                
 
-                if( !oldMarker || oldMarker.ts != marker.ts ) {
-                    changes.push( new This.Change( marker, oldMarker ) );
-                    this.latestInfo[ key ] = marker;
-                }
-            }
-            return changes;
-        } );
+    getAll( keys?: any ): Observable<This.MarkerInfo[]> {
+        return this.getAllDb();
     }
-
+    
     add( key: string, lat: number, lng: number, icon: number ): Promise<void> {
         return this.setDb( { key: key, lat: lat, lng: lng, i: icon, t: DB.TimeStamp } );
     }

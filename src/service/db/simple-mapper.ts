@@ -51,16 +51,15 @@ export abstract class SimpleMapper<T> implements DB.Mapper<T> {
     getDb( keys?: any ): Observable<T> {
         return this.mapper.get( keys ).map( dbData => {
             // 存在しなければ null
-            if( dbData.values.$exists() ) {
-                return this.db2obj( dbData.keys, dbData.values );
-            } else {
+            if( !dbData.values.$exists() ) {
                 return null;
             }
+            return this.db2obj( dbData.keys, dbData.values );
         } );
     }
 
     // --------------------------------------------------------------------------------------------
-    // C[R]UD
+    // C[R]UD: 更新した箇所だけ取り出すようにしたい(タイムスタンプ)
     // --------------------------------------------------------------------------------------------
     getAllDb( keys?: any ): Observable<T[]>  {
         return this.mapper.getAll( keys ).map( dbData => {
@@ -72,7 +71,20 @@ export abstract class SimpleMapper<T> implements DB.Mapper<T> {
             return result;
         } );
     }
-
+    
+    // --------------------------------------------------------------------------------------------
+    // C[R]UD: 更新した箇所だけ取り出すようにしたい(タイムスタンプ)
+    // --------------------------------------------------------------------------------------------
+    getAllMapDb( keys?: any ): Observable<{[key:string]:T}>  {
+        return this.mapper.getAllMap( keys ).map( dbData => {
+            let result: { [key:string]: T } = {};
+            for( let key in dbData.values ) {
+                result[ key ] = this.db2obj( dbData.keys, dbData.values[ key ] );
+            }
+            return result;
+        } );
+    }
+    
     // --------------------------------------------------------------------------------------------
     // オブジェクトを渡して、DBの値を一部上書きする(タイムスタンプを上書きから除外したい場合を想定)
     // --------------------------------------------------------------------------------------------

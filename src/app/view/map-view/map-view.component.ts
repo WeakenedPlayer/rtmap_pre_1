@@ -68,14 +68,7 @@ class MyMapControl extends Map.Control {
         super();
     }
     
-    applyChanges( changes: Map.Change[] ) {
-        for( let change of changes ) {
-            if( !change.oldValue ) {
-                let marker = Leaflet.marker( [ change.newValue.lat, change.newValue.lng ] );
-                this.map.addLayer( marker );
-            }
-
-        }
+    applyChanges( changes: { [key:string]: Map.Change } ) {
     }
 }
 
@@ -91,11 +84,11 @@ export class MapViewComponent implements OnInit {
     constructor( private af: AngularFire, private location: Location, private router: Router ) {
         this.mapControl = new MyMapControl();
         this.db = new Map.MarkerInfoDB( af, DB.Path.fromUrl( '/map/marker' ) );
-        this.db.push( -10, 20, 1 );
-        this.db.get('-KhHsUhHYAN82hGgJjgA').do( co => console.log( co ) ).subscribe();
-        this.db.getChanges().do( changes => {
-            this.mapControl.applyChanges( changes );
-        } ).subscribe();
+        let obs = this.db.getAll().publishReplay(1).refCount();
+
+        DB.ChangeObservable.modified<Map.MarkerInfo>( obs, ( obj )=> obj.key, ( obj )=> obj.ts ).subscribe( changed => console.log( changed ) );  
+        DB.ChangeObservable.added<Map.MarkerInfo>( obs, ( obj )=> obj.key ).subscribe( changed => console.log( changed ) );  
+        DB.ChangeObservable.removed<Map.MarkerInfo>( obs, ( obj )=> obj.key ).subscribe( changed => console.log( changed ) );  
     }
 
     ngOnInit() {
