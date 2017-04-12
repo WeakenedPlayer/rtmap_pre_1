@@ -14,18 +14,18 @@ export class ChangeObservable{
                         keyOf: ( obj: T ) => string | number,
                         signatureOf: ( obj: T ) => string | number ): Observable<T[]>{
         let signatures: { [key:string]: string | number } = {};
-        let newSignatures: { [key:string]: string | number } = {};
-        return obs.map( array => {
+        return obs.map( array => {    
             let modifiedObjects: T[] = [];
+            let newSignatures: { [key:string]: string | number } = {};
             
             for( let obj of array ) {
                 let signature = signatureOf( obj );
                 let key = keyOf( obj );
                 let oldSignature = signatures[ key ];
+                newSignatures[ key ] = signature;
                 
                 // 以前から存在していて、前回と変化したら
                 if( oldSignature && oldSignature != signature ) {
-                    newSignatures[ key ] = signature;
                     modifiedObjects.push( obj );
                 }
             }
@@ -36,41 +36,41 @@ export class ChangeObservable{
                 return modifiedObjects;
             }
         } );
-//      } ).filter( result => result.length > 0 );
     }
         
     static added<T>( obs: Observable<T[]>,
                      keyOf: ( obj: T ) => string | number ): Observable<T[]>{
         let keys: { [key:string]: boolean } = {};
-        let newKeys: { [key:string]: boolean } = {};
                          
         return obs.map( array => {
+            //console.log( 'add' );
+            //console.log( keys );      
             let newObjects: T[] = [];
+            let newKeys: { [key:string]: boolean } = {};
 
             for( let obj of array ) {
                 let key = keyOf( obj );
-                
+                newKeys[ key ] = true;
+
                 // 以前存在してないなら
                 if( !keys[ key ] ) {
-                    newKeys[ key ] = true;
+                    console.log( key );      
                     newObjects.push( obj );
                 }
             }
-            console.log( keys );
             keys = newKeys;
             if( newObjects ) {
                 return newObjects;
             }
         } );
-//      } ).filter( result => result.length > 0 );
     }
 
     static removed<T>( obs: Observable<T[]>,
                        keyOf: ( obj: T ) => string | number ): Observable<string[]>{
     let keys: { [key:string]: boolean } = {};
-    let newKeys: { [key:string]: boolean } = {};
                      
     return obs.map( array => {
+        let newKeys: { [key:string]: boolean } = {};
         let removedKeys: string[] = [];
 
         for( let obj of array ) {
@@ -83,11 +83,11 @@ export class ChangeObservable{
             removedKeys.push( key );
         }
         keys = newKeys;
+        console.log( removedKeys );
         if( removedKeys ) {
             return removedKeys;
         }
     } );
-//    } ).filter( result => result.length > 0 );
 }
 }
 
