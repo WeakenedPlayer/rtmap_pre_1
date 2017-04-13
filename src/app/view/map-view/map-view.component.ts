@@ -43,8 +43,8 @@ class MyMapControl extends Map.Control {
     private tile: Leaflet.TileLayer;
     private layer: Leaflet.LayerGroup;
     private markers: { [key: string]: Leaflet.Marker } = {};
-    private click$: Subject<DbMarker> = new Subject();
-    private dragstart$: Subject<DbMarker> = new Subject();
+    private click$: Subject<Leaflet.Event> = new Subject();
+    private dragstart$: Subject<Leaflet.Event> = new Subject();
     
     protected postMapCreated(): void {
         this.tile = Leaflet.tileLayer( ContinentInfoList[0].url, TileOption );
@@ -71,8 +71,8 @@ class MyMapControl extends Map.Control {
         let added = DB.ChangeObservable.added<Map.MarkerInfo>( obs, ( obj )=> obj.key ).do( markers => {
             for( let marker of markers ) {
                 let m = new DbMarker( marker.key, [ marker.lat, marker.lng ] );
-                m.addEventListener( 'click', evt => this.click$.next( evt.target ) );
-                m.addEventListener( 'dragstart', evt => this.dragstart$.next( evt.target ) );
+                m.addEventListener( 'click', evt => this.click$.next( evt ) );
+                m.addEventListener( 'dragstart', evt => this.dragstart$.next( evt ) );
                 this.markers[ marker.key ] = m;
                 this.layer.addLayer( m );
             }
@@ -85,25 +85,36 @@ class MyMapControl extends Map.Control {
         } ).subscribe();
         this.db.push( - Math.random() * 100 - 100, Math.random() * 100 + 100, 9 );
 
-        this.click$.do( marker => {
-            if( marker.options.draggable ) {
-                marker.dragging.disable();
-                marker.options.draggable = false;
-            } else {
-                marker.dragging.enable();
-                marker.options.draggable = true;
-            }
-        } ).subscribe();
+        this.click$
+        .do( event => this.toggleMarkerDraggable( event ) )
+        .subscribe();
         
+        this.dragstart$
+        .flatMap( event => this.startDraggingMarker( event ) )
+        .do( event => this.endDraggingMarker( event ) )
+        .subscribe();
+    }
 
-        this.dragstart$.flatMap( marker => {
-            return marker.dragEnd$.take(1);
-        } ).do( event => {
-            let marker = event.target;
-            console.log( 'drag end' );
-            console.log( event );
-            this.db.update( marker.key, marker._latlng.lat, marker._latlng.lng, 1); 
-        } ).subscribe();
+    toggleMarkerDraggable( event: Leaflet.Event ) {
+        let marker = event.target;
+        if( marker.options.draggable ) {
+            marker.dragging.disable();
+            marker.options.draggable = false;
+        } else {
+            marker.dragging.enable();
+            marker.options.draggable = true;
+        }
+    }
+    
+    startDraggingMarker( event: Leaflet.Event ) { 
+        let marker = event.target as DbMarker;
+        return marker.dragEnd$.take(1);
+    }
+    
+    endDraggingMarker( event: Leaflet.Event ) {
+        let marker = event.target as DbMarker;
+        let latlng = marker.getLatLng();
+        return Observable.fromPromise( this.db.update( marker.key, latlng.lat, latlng.lng, 1) ); 
     }
 }
 
