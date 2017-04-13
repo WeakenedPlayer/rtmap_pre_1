@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Renderer, ElementRef } from '@angular/core';
-import { Map } from './index';
+import { Map } from 'component';
 
 @Component({
   selector: 'map',

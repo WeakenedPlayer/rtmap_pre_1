@@ -1,8 +1,6 @@
-import { DB } from 'service';
+import { DB, Map } from 'component';
 import { AngularFire } from 'angularfire2';
 import { Observable } from 'rxjs';
-import * as Leaflet from 'leaflet';
-import * as This from './modules';
 
 // $key    : key
 // $exists : existsプロパティより 
@@ -11,23 +9,23 @@ import * as This from './modules';
 // i   : icon
 // t   : time stamp
 // 効率が悪い。配列の変化は一度に1つだけ。
-export class MarkerInfoDB extends DB.SimpleMapper<This.MarkerInfo>{
-    private latestInfo: { [key:string]: This.MarkerInfo } = {};
+export class MarkerInfoRepo extends DB.SimpleMapper<Map.MarkerInfo>{
+    private latestInfo: { [key:string]: Map.MarkerInfo } = {};
 
     constructor( af: AngularFire, path: DB.Path ){
         super( af, path.move( DB.Path.fromUrl('$key') ) );
     }
     
-    db2obj( keys: any, values: any ): This.MarkerInfo {
+    db2obj( keys: any, values: any ): Map.MarkerInfo {
         // 存在が消えたことは判断できない(配列の場合、配列全体に対してExistsが適用される)
-        return new This.MarkerInfo( values.$key, values.t, values.lat, values.lng, values.i );
+        return new Map.MarkerInfo( values.$key, values.t, values.lat, values.lng, values.i );
     }
 
-    get( key: string ): Observable<This.MarkerInfo> {
+    get( key: string ): Observable<Map.MarkerInfo> {
         return this.getDb( { key: key } );
     } 
 
-    getAll( keys?: any ): Observable<This.MarkerInfo[]> {
+    getAll( keys?: any ): Observable<Map.MarkerInfo[]> {
         return this.getAllDb();
     }
     

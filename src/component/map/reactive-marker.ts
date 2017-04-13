@@ -1,6 +1,7 @@
 import * as Leaflet from 'leaflet';
 import { Subject } from 'rxjs';
 
+
 export class ReactiveMarker extends Leaflet.Marker {
     private clickSubject: Subject<Leaflet.MouseEvent> = new Subject();
     private doubleClickSubject: Subject<Leaflet.MouseEvent> = new Subject();

@@ -1,4 +1,4 @@
-import { DB, ID } from '../../index';
+import { DB } from 'component';
 import { AngularFire  } from 'angularfire2';
 import { Observable } from 'rxjs';
 

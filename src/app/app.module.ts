@@ -5,7 +5,8 @@ import { HttpModule } from '@angular/http';
 import { AngularFireModule, AuthProviders, AuthMethods } from 'angularfire2';
 
 import { AppComponent } from './app.component';
-import { Census, ID } from '../service';
+import { Census } from '../component';
+import { ID } from 'app/service';
 import { ViewModule } from './view/view.module';
 
 const firebaseConfig = {

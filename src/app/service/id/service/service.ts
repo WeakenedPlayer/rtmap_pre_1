@@ -4,13 +4,14 @@ import { Observable, Subscription, BehaviorSubject } from 'rxjs';
 import { AngularFire, AngularFireAuth, FirebaseAuthState } from 'angularfire2';
 import * as firebase from 'firebase';
 
-import { ID, DB } from '../../';
+import { DB } from 'component';
+import * as This from '../modules';
 
 const rootUrl = '/ids';
 @Injectable()
 export class Service {
     // private化する
-    private currentUserObservable: Observable<ID.UserInfo>;
+    private currentUserObservable: Observable<This.UserInfo>;
     private authStateObservable: Observable<FirebaseAuthState>;
 
     // 読み込み状況...読み込み開始～完了までが false であること。
@@ -22,7 +23,7 @@ export class Service {
     get $isAuthStateLoaded(){ return this.isAuthStateLoaded; }
     get $isCurrentUserLoaded(){ return this.isCurrentUserLoaded; }
 
-    userRepos: ID.UserInfoRepo;
+    userRepos: This.UserInfoRepo;
     //reqRepos: ID.RequestRepos;
 
     subscription: Subscription;
@@ -31,7 +32,7 @@ export class Service {
         // 大きくないので実体を作ってしまう
         let root = DB.Path.fromUrl( rootUrl );
         this.subscription = new Subscription();
-        this.userRepos = new ID.UserInfoRepo( this.af, root );
+        this.userRepos = new This.UserInfoRepo( this.af, root );
         // this.reqRepos = new ID.RequestRepos( this.af, root );
 
         this.authStateObservable = ( this.af.auth as Observable<FirebaseAuthState> ).do( authState => {
@@ -52,12 +53,12 @@ export class Service {
     // --------------------------------------------------------------------------------------------
     // ログイン後に1回だけ行う、最終ログイン日更新(UIDの登録がなければ登録)
     // --------------------------------------------------------------------------------------------
-    private postAuthentication( authState: FirebaseAuthState ): Observable<ID.UserInfo>{
+    private postAuthentication( authState: FirebaseAuthState ): Observable<This.UserInfo>{
         if( authState ) {
             return this.userRepos.getById( authState.auth.uid ).take(1)
             .do( user => {
                 // 登録状況に応じて新規登録 or 更新する
-                let next: Observable<ID.UserInfo>;
+                let next: Observable<This.UserInfo>;
                 if( user ) {
                     if( user.hasAdmittance ) {
                         next = Observable.fromPromise( this.userRepos.update( user.id ) ).map( () => user );

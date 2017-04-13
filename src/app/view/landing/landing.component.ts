@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AngularFire , FirebaseObjectObservable, FirebaseListObservable, AngularFireAuth, FirebaseRef } from 'angularfire2';
 import * as firebase from 'firebase';       // required for timestamp
 import { Subscription, Observable } from 'rxjs';
-import { ID } from '../../../service';
+import { ID } from 'app/service';
 import 'rxjs/add/operator/toPromise';
 
 @Component({

@@ -3,4 +3,3 @@ export * from './path';
 export * from './object-mapper';
 export * from './simple-mapper';
 export * from './composite-mapper';
-export * from './change-observable';

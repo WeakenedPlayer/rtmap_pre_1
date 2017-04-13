@@ -7,7 +7,3 @@ export class MarkerInfo {
             public icon: string
             ) {}
 }
-
-export class Change {
-    constructor( public newValue: MarkerInfo, public oldValue: MarkerInfo ) {}
-}

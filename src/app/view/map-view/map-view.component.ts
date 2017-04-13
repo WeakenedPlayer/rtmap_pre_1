@@ -1,10 +1,10 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
-import { Leaflet, Map } from '../../ui';
 import { Observable, Subject } from 'rxjs';
-import { AngularFire } from 'angularfire2';;
-import { DB } from 'service';
+import { AngularFire } from 'angularfire2';
+import { Leaflet, Map, DB, ChangeObservable } from 'component';
+
 
 const MapOption: Leaflet.MapOptions = {
         crs: Leaflet.CRS.Simple,
@@ -39,7 +39,7 @@ class DbMarker extends Map.ReactiveMarker {
 }
 
 class MyMapControl extends Map.Control {
-    db: Map.MarkerInfoDB;
+    db: Map.MarkerInfoRepo;
     private tile: Leaflet.TileLayer;
     private layer: Leaflet.LayerGroup;
     private markers: { [key: string]: Leaflet.Marker } = {};
@@ -59,16 +59,16 @@ class MyMapControl extends Map.Control {
     constructor( private af: AngularFire ) {
         super();
         this.layer = Leaflet.layerGroup([]);
-        this.db = new Map.MarkerInfoDB( af, DB.Path.fromUrl( '/map/marker' ) );
+        this.db = new Map.MarkerInfoRepo( af, DB.Path.fromUrl( '/map/marker' ) );
         let obs = this.db.getAll().publishReplay(1).refCount();
         
-        let modified = DB.ChangeObservable.modified<Map.MarkerInfo>( obs, ( obj )=> obj.key, ( obj )=> obj.ts ).do( markers => {
+        let modified = ChangeObservable.modified<Map.MarkerInfo>( obs, ( obj )=> obj.key, ( obj )=> obj.ts ).do( markers => {
              for( let marker of markers ) {
                  this.markers[ marker.key ].setLatLng( [ marker.lat, marker.lng ] );
              }
         } ).subscribe();
         
-        let added = DB.ChangeObservable.added<Map.MarkerInfo>( obs, ( obj )=> obj.key ).do( markers => {
+        let added = ChangeObservable.added<Map.MarkerInfo>( obs, ( obj )=> obj.key ).do( markers => {
             for( let marker of markers ) {
                 let m = new DbMarker( marker.key, [ marker.lat, marker.lng ] );
                 m.addEventListener( 'click', evt => this.click$.next( evt ) );
@@ -78,7 +78,7 @@ class MyMapControl extends Map.Control {
             }
         } ).subscribe();
         
-        let removed = DB.ChangeObservable.removed<Map.MarkerInfo>( obs, ( obj )=> obj.key ).do( keys => {
+        let removed = ChangeObservable.removed<Map.MarkerInfo>( obs, ( obj )=> obj.key ).do( keys => {
             for( let key of keys ) {
                 this.markers[ key ].remove();
             }

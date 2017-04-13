@@ -1,5 +1,5 @@
 import { Component, OnInit, Input  } from '@angular/core';
-import { Census } from 'service';
+import { Census } from 'component';
 import { CharacterProfile } from './character-profile';
 
 @Component({
