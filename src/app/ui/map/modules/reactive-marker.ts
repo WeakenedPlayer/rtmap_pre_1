@@ -22,7 +22,7 @@ export class ReactiveMarker extends Leaflet.Marker {
     get drag$() { return this.dragSubject.asObservable(); }
     get dragEnd$() { return this.dragEndSubject.asObservable(); }
 
-    constructor( latLng: Leaflet.LatLng, options: Leaflet.MarkerOptions ) {
+    constructor( latLng: Leaflet.LatLngExpression, options?: Leaflet.MarkerOptions ) {
         super( latLng, options );
         
         // イベントハンドラをSubjectに置き換え(冗長だけど便利になるはず)

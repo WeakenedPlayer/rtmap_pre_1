@@ -32,14 +32,19 @@ const ContinentInfoList = [
     { id: 4, name: 'Hossin', url: 'https://raw.githubusercontent.com/WeakenedPlayer/resource/master/map/hossin/{z}/{y}/{x}.jpg'}
 ];
 
-
+class DbMarker extends Map.ReactiveMarker {
+    constructor( public readonly key: string, latLng: Leaflet.LatLngExpression ) {
+        super( latLng );
+    }
+}
 
 class MyMapControl extends Map.Control {
     db: Map.MarkerInfoDB;
     private tile: Leaflet.TileLayer;
     private layer: Leaflet.LayerGroup;
     private markers: { [key: string]: Leaflet.Marker } = {};
-    private click$: Subject<Leaflet.Marker> = new Subject();
+    private click$: Subject<DbMarker> = new Subject();
+    private dragstart$: Subject<DbMarker> = new Subject();
     
     protected postMapCreated(): void {
         this.tile = Leaflet.tileLayer( ContinentInfoList[0].url, TileOption );
@@ -56,38 +61,48 @@ class MyMapControl extends Map.Control {
         this.layer = Leaflet.layerGroup([]);
         this.db = new Map.MarkerInfoDB( af, DB.Path.fromUrl( '/map/marker' ) );
         let obs = this.db.getAll().publishReplay(1).refCount();
+        
         let modified = DB.ChangeObservable.modified<Map.MarkerInfo>( obs, ( obj )=> obj.key, ( obj )=> obj.ts ).do( markers => {
              for( let marker of markers ) {
                  this.markers[ marker.key ].setLatLng( [ marker.lat, marker.lng ] );
              }
         } ).subscribe();
+        
         let added = DB.ChangeObservable.added<Map.MarkerInfo>( obs, ( obj )=> obj.key ).do( markers => {
             for( let marker of markers ) {
-                let m = Leaflet.marker( [ marker.lat, marker.lng ] );
-                m.addEventListener( 'click', ( evt )=>{ this.click$.next( m ) });
-                m.addEventListener( 'click', ( evt )=>{ this.click$.next( m ) });
+                let m = new DbMarker( marker.key, [ marker.lat, marker.lng ] );
+                m.addEventListener( 'click', evt => this.click$.next( evt.target ) );
+                m.addEventListener( 'dragstart', evt => this.dragstart$.next( evt.target ) );
                 this.markers[ marker.key ] = m;
                 this.layer.addLayer( m );
             }
         } ).subscribe();
+        
         let removed = DB.ChangeObservable.removed<Map.MarkerInfo>( obs, ( obj )=> obj.key ).do( keys => {
             for( let key of keys ) {
                 this.markers[ key ].remove();
             }
         } ).subscribe();
-//        Observable.concat( [ added, removed ] ).subscribe();
         this.db.push( - Math.random() * 100 - 100, Math.random() * 100 + 100, 9 );
-        
+
         this.click$.do( marker => {
             if( marker.options.draggable ) {
-                console.log( 'disabling') ;
                 marker.dragging.disable();
                 marker.options.draggable = false;
             } else {
-                console.log( 'enabling') ;
                 marker.dragging.enable();
                 marker.options.draggable = true;
             }
+        } ).subscribe();
+        
+
+        this.dragstart$.flatMap( marker => {
+            return marker.dragEnd$.take(1);
+        } ).do( event => {
+            let marker = event.target;
+            console.log( 'drag end' );
+            console.log( event );
+            this.db.update( marker.key, marker._latlng.lat, marker._latlng.lng, 1); 
         } ).subscribe();
     }
 }
