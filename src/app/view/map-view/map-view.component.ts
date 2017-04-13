@@ -2,7 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
 import { Leaflet, Map } from '../../ui';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { AngularFire } from 'angularfire2';;
 import { DB } from 'service';
 
@@ -39,6 +39,7 @@ class MyMapControl extends Map.Control {
     private tile: Leaflet.TileLayer;
     private layer: Leaflet.LayerGroup;
     private markers: { [key: string]: Leaflet.Marker } = {};
+    private click$: Subject<Leaflet.Marker> = new Subject();
     
     protected postMapCreated(): void {
         this.tile = Leaflet.tileLayer( ContinentInfoList[0].url, TileOption );
@@ -63,6 +64,8 @@ class MyMapControl extends Map.Control {
         let added = DB.ChangeObservable.added<Map.MarkerInfo>( obs, ( obj )=> obj.key ).do( markers => {
             for( let marker of markers ) {
                 let m = Leaflet.marker( [ marker.lat, marker.lng ] );
+                m.addEventListener( 'click', ( evt )=>{ this.click$.next( m ) });
+                m.addEventListener( 'click', ( evt )=>{ this.click$.next( m ) });
                 this.markers[ marker.key ] = m;
                 this.layer.addLayer( m );
             }
@@ -74,10 +77,21 @@ class MyMapControl extends Map.Control {
         } ).subscribe();
 //        Observable.concat( [ added, removed ] ).subscribe();
         this.db.push( - Math.random() * 100 - 100, Math.random() * 100 + 100, 9 );
+        
+        this.click$.do( marker => {
+            if( marker.options.draggable ) {
+                console.log( 'disabling') ;
+                marker.dragging.disable();
+                marker.options.draggable = false;
+            } else {
+                console.log( 'enabling') ;
+                marker.dragging.enable();
+                marker.options.draggable = true;
+            }
+        } ).subscribe();
     }
-    
-    
 }
+
 
 
 @Component({

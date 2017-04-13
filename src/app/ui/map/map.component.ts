@@ -2,10 +2,10 @@ import { Component, OnInit, Input, Renderer, ElementRef } from '@angular/core';
 import { Map } from './index';
 
 @Component({
-  selector: 'leaflet-map',
+  selector: 'map',
   template: ''
 })
-export class LeafletMapComponent implements OnInit {
+export class MapComponent implements OnInit {
     @Input() control: Map.Control;
     private mapDiv: any;    // map を設置する
     constructor( private el: ElementRef, private re: Renderer ) {

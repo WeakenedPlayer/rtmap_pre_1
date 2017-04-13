@@ -25,7 +25,7 @@ export class ReactiveMarker extends Leaflet.Marker {
     constructor( latLng: Leaflet.LatLng, options: Leaflet.MarkerOptions ) {
         super( latLng, options );
         
-        // イベントハンドラをSubjectに置き換え
+        // イベントハンドラをSubjectに置き換え(冗長だけど便利になるはず)
         this.addEventListener( 'click',       ( event ) => { this.clickSubject.next( event as Leaflet.MouseEvent ) } );
         this.addEventListener( 'dblclick',    ( event ) => { this.doubleClickSubject.next( event as Leaflet.MouseEvent ) } );
         this.addEventListener( 'mousedown',   ( event ) => { this.mouseDownSubject.next( event as Leaflet.MouseEvent ) } );
