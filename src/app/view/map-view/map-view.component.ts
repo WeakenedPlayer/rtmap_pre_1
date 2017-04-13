@@ -56,16 +56,11 @@ class MyMapControl extends Map.Control {
         this.db = new Map.MarkerInfoDB( af, DB.Path.fromUrl( '/map/marker' ) );
         let obs = this.db.getAll().publishReplay(1).refCount();
         let modified = DB.ChangeObservable.modified<Map.MarkerInfo>( obs, ( obj )=> obj.key, ( obj )=> obj.ts ).do( markers => {
-//            console.log( 'mod' );
-//            console.log( markers );
              for( let marker of markers ) {
                  this.markers[ marker.key ].setLatLng( [ marker.lat, marker.lng ] );
              }
         } ).subscribe();
-        console.log( 'test');
         let added = DB.ChangeObservable.added<Map.MarkerInfo>( obs, ( obj )=> obj.key ).do( markers => {
-//            console.log( 'add' );
-//            console.log( markers );
             for( let marker of markers ) {
                 let m = Leaflet.marker( [ marker.lat, marker.lng ] );
                 this.markers[ marker.key ] = m;
@@ -73,10 +68,7 @@ class MyMapControl extends Map.Control {
             }
         } ).subscribe();
         let removed = DB.ChangeObservable.removed<Map.MarkerInfo>( obs, ( obj )=> obj.key ).do( keys => {
-//            console.log( 'removed' );
-//            console.log( keys );
             for( let key of keys ) {
-                console.log( key );
                 this.markers[ key ].remove();
             }
         } ).subscribe();
