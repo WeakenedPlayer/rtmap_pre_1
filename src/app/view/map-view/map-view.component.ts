@@ -32,10 +32,11 @@ const ContinentInfoList = [
     { id: 4, name: 'Hossin', url: 'https://raw.githubusercontent.com/WeakenedPlayer/resource/master/map/hossin/{z}/{y}/{x}.jpg'}
 ];
 
+
 class DbMarker extends Map.ReactiveMarker {
-    constructor( public readonly key: string, latLng: Leaflet.LatLngExpression ) {
+    constructor( public key: string, latLng: Leaflet.LatLngExpression ){
         super( latLng );
-    }
+    } 
 }
 
 class MyMapControl extends Map.Control {
