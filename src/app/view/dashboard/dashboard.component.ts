@@ -13,11 +13,11 @@ export class DashboardComponent implements OnInit {
     profile: CharacterProfile;
     constructor( private location: Location, private router: Router, private ids: ID.Service ) {
         this.profile = new CharacterProfile( '***', '****', '****', '****');
-        console.log( this.profile );
+//        console.log( this.profile );
     }
 
     ngOnInit() {
-        console.log( this.profile );
+//        console.log( this.profile );
     }
 
     goBack() {

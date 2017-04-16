@@ -23,7 +23,7 @@ const routes: Routes = [
                         { path: '',  component: LandingComponent },
                         { path: 'dashboard',  component: DashboardComponent },
                         { path: 'map',  component: MapViewComponent },
-                        { path: '**', component: NotFoundComponent }
+                        { path: '**', component: LandingComponent }
                       ];
 @NgModule({
   declarations: [ LandingComponent, 

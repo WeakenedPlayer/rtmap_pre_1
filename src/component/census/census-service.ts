@@ -33,7 +33,7 @@ export class Service {
                     this.worldMap[ world.world_id ] = world;
                 }
             }
-            console.log(  this.worldMap );
+//            console.log(  this.worldMap );
         } );
         
     } 

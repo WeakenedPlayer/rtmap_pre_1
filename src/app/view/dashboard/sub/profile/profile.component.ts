@@ -13,6 +13,6 @@ export class ProfileComponent implements OnInit {
     }
 
     ngOnInit() {
-        console.log( this.profile);
+//        console.log( this.profile);
     }
 }

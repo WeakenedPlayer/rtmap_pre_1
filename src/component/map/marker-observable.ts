@@ -8,36 +8,39 @@ export class MarkerObservable {
         return subject.asObservable();
     }
     
-    fromClickEvent( marker: Leaflet.Marker ): Observable<Leaflet.MouseEvent> {
+    static fromClickEvent( marker: Leaflet.Marker ): Observable<Leaflet.MouseEvent> {
         return MarkerObservable.fromEvent<Leaflet.MouseEvent>( marker, 'click' );
     }
     
-    fromDoubleClickEvent( marker: Leaflet.Marker ): Observable<Leaflet.MouseEvent> {
+    static fromDoubleClickEvent( marker: Leaflet.Marker ): Observable<Leaflet.MouseEvent> {
         return MarkerObservable.fromEvent<Leaflet.MouseEvent>( marker, 'dblclick' );
     }
     
-    fromMouseDownEvent( marker: Leaflet.Marker ): Observable<Leaflet.MouseEvent> {
+    static fromMouseDownEvent( marker: Leaflet.Marker ): Observable<Leaflet.MouseEvent> {
         return MarkerObservable.fromEvent<Leaflet.MouseEvent>( marker, 'mousedown' );
     }
     
-    fromMouseOverEvent( marker: Leaflet.Marker ): Observable<Leaflet.MouseEvent> {
+    static fromMouseOverEvent( marker: Leaflet.Marker ): Observable<Leaflet.MouseEvent> {
         return MarkerObservable.fromEvent<Leaflet.MouseEvent>( marker, 'mouseover' );
     }
     
-    fromMouseOutEvent( marker: Leaflet.Marker ): Observable<Leaflet.MouseEvent> {
+    static fromMouseOutEvent( marker: Leaflet.Marker ): Observable<Leaflet.MouseEvent> {
         return MarkerObservable.fromEvent<Leaflet.MouseEvent>( marker, 'mouseout' );
     }
 
-    fromContextMenuEvent( marker: Leaflet.Marker ): Observable<Leaflet.MouseEvent> {
+    static fromContextMenuEvent( marker: Leaflet.Marker ): Observable<Leaflet.MouseEvent> {
         return MarkerObservable.fromEvent<Leaflet.MouseEvent>( marker, 'contextmenu' );
     }
-    fromDragStartEvent( marker: Leaflet.Marker ): Observable<Leaflet.Event> {
+    
+    static fromDragStartEvent( marker: Leaflet.Marker ): Observable<Leaflet.Event> {
         return MarkerObservable.fromEvent<Leaflet.Event>( marker, 'dragstart' );
     }
-    fromDragEvent( marker: Leaflet.Marker ): Observable<Leaflet.Event> {
+    
+    static fromDragEvent( marker: Leaflet.Marker ): Observable<Leaflet.Event> {
         return MarkerObservable.fromEvent<Leaflet.Event>( marker, 'drag' );
     }
-    fromDragEndEvent( marker: Leaflet.Marker ): Observable<Leaflet.Event> {
+    
+    static fromDragEndEvent( marker: Leaflet.Marker ): Observable<Leaflet.Event> {
         return MarkerObservable.fromEvent<Leaflet.Event>( marker, 'dragend' );
     }
 }

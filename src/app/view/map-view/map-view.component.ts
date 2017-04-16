@@ -83,7 +83,6 @@ class MyMapControl extends Map.Control {
                 this.markers[ key ].remove();
             }
         } ).subscribe();
-        this.db.push( - Math.random() * 100 - 100, Math.random() * 100 + 100, 9 );
 
         this.click$
         .do( event => this.toggleMarkerDraggable( event ) )
