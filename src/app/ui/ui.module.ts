@@ -4,7 +4,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
-import { MapComponent } from './map.component';
+import { MapComponent } from './rtmap/rtmap.component';
 
 @NgModule({
   declarations: [ MapComponent ],

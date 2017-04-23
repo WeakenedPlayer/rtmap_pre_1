@@ -1,17 +1,17 @@
 import * as Leaflet from 'leaflet';
+import * as This from './modules';
 import { Observable } from 'rxjs';
-import { Map } from 'component';
 
 export class ReactiveMarker extends Leaflet.Marker {
-    private clickObservable: Observable<Leaflet.MouseEvent> = Map.MarkerObservable.fromClickEvent( this ).publish();
-    private doubleClickObservable: Observable<Leaflet.MouseEvent> = Map.MarkerObservable.fromDoubleClickEvent( this ).publish();
-    private mouseDownObservable: Observable<Leaflet.MouseEvent> = Map.MarkerObservable.fromMouseDownEvent( this ).publish();
-    private mouseOverObservable: Observable<Leaflet.MouseEvent> = Map.MarkerObservable.fromMouseOverEvent( this ).publish();
-    private mouseOutObservable: Observable<Leaflet.MouseEvent> = Map.MarkerObservable.fromMouseOutEvent( this ).publish();
-    private contextMenuObservable: Observable<Leaflet.MouseEvent> = Map.MarkerObservable.fromContextMenuEvent( this ).publish();
-    private dragStartObservable: Observable<Leaflet.Event> = Map.MarkerObservable.fromDragStartEvent( this ).publish();
-    private dragObservable: Observable<Leaflet.Event> = Map.MarkerObservable.fromDragEvent( this ).publish();
-    private dragEndObservable: Observable<Leaflet.Event> = Map.MarkerObservable.fromDragEndEvent( this ).publish();
+    private clickObservable: Observable<Leaflet.MouseEvent> = This.MarkerObservable.fromClickEvent( this ).publish().refCount();
+    private doubleClickObservable: Observable<Leaflet.MouseEvent> = This.MarkerObservable.fromDoubleClickEvent( this ).publish().refCount();
+    private mouseDownObservable: Observable<Leaflet.MouseEvent> = This.MarkerObservable.fromMouseDownEvent( this ).publish().refCount();
+    private mouseOverObservable: Observable<Leaflet.MouseEvent> = This.MarkerObservable.fromMouseOverEvent( this ).publish().refCount();
+    private mouseOutObservable: Observable<Leaflet.MouseEvent> = This.MarkerObservable.fromMouseOutEvent( this ).publish().refCount();
+    private contextMenuObservable: Observable<Leaflet.MouseEvent> = This.MarkerObservable.fromContextMenuEvent( this ).publish().refCount();
+    private dragStartObservable: Observable<Leaflet.Event> = This.MarkerObservable.fromDragStartEvent( this ).publish().refCount();
+    private dragObservable: Observable<Leaflet.Event> = This.MarkerObservable.fromDragEvent( this ).publish().refCount();
+    private dragEndObservable: Observable<Leaflet.Event> = This.MarkerObservable.fromDragEndEvent( this ).publish().refCount();
 
     get click$() { return this.clickObservable; }
     get doubleClick$() { return this.doubleClickObservable; }

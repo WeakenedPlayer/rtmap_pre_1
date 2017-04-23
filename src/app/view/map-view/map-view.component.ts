@@ -1,9 +1,10 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Renderer2 } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, Subscription } from 'rxjs';
 import { AngularFire } from 'angularfire2';
 import { Leaflet, Map, DB, ChangeObservable } from 'component';
+import { UI } from 'app/ui';
 
 
 const MapOption: Leaflet.MapOptions = {
@@ -40,81 +41,65 @@ class DbMarker extends Map.ReactiveMarker {
 }
 
 class MyMapControl extends Map.Control {
-    db: Map.MarkerInfoRepo;
+    private db: UI.Rtmap.MarkerDataRepo;
+    private layer: UI.Rtmap.MarkerLayer;
     private tile: Leaflet.TileLayer;
-    private layer: Leaflet.LayerGroup;
-    private markers: { [key: string]: Leaflet.Marker } = {};
-    private click$: Subject<Leaflet.Event> = new Subject();
-    private dragstart$: Subject<Leaflet.Event> = new Subject();
-    
-    protected postMapCreated(): void {
-        this.tile = Leaflet.tileLayer( ContinentInfoList[0].url, TileOption );
-        this.map.addLayer( this.tile );
-        this.map.addLayer( this.layer );
-    }
-    
+    private subscription: Subscription;
+
     protected mapOptions(): Leaflet.MapOptions {
         return MapOption;
     }
 
-    constructor( private af: AngularFire ) {
-        super();
-        this.layer = Leaflet.layerGroup([]);
-        this.db = new Map.MarkerInfoRepo( af, DB.Path.fromUrl( '/map/marker' ) );
-        let obs = this.db.getAll().publishReplay(1).refCount();
-        
-        let modified = ChangeObservable.modified<Map.MarkerInfo>( obs, ( obj )=> obj.key, ( obj )=> obj.ts ).do( markers => {
-             for( let marker of markers ) {
-                 this.markers[ marker.key ].setLatLng( [ marker.lat, marker.lng ] );
-             }
-        } ).subscribe();
-        
-        let added = ChangeObservable.added<Map.MarkerInfo>( obs, ( obj )=> obj.key ).do( markers => {
-            for( let marker of markers ) {
-                let m = new DbMarker( marker.key, [ marker.lat, marker.lng ] );
-                m.addEventListener( 'click', evt => this.click$.next( evt ) );
-                m.addEventListener( 'dragstart', evt => this.dragstart$.next( evt ) );
-                this.markers[ marker.key ] = m;
-                this.layer.addLayer( m );
-            }
-        } ).subscribe();
-        
-        let removed = ChangeObservable.removed<Map.MarkerInfo>( obs, ( obj )=> obj.key ).do( keys => {
-            for( let key of keys ) {
-                this.markers[ key ].remove();
-            }
-        } ).subscribe();
-
-        this.click$
-        .do( event => this.toggleMarkerDraggable( event ) )
-        .subscribe();
-        
-        this.dragstart$
-        .flatMap( event => this.startDraggingMarker( event ) )
-        .do( event => this.endDraggingMarker( event ) )
-        .subscribe();
+    protected postRegistered(): void {
+        this.map.addLayer( this.tile );
+        this.map.addLayer( this.layer );
+        this.subscription = this.layer.sync$.subscribe();
     }
 
-    toggleMarkerDraggable( event: Leaflet.Event ) {
-        let marker = event.target;
+    constructor( private af: AngularFire ) {
+        super();
+        this.tile = Leaflet.tileLayer( ContinentInfoList[0].url, TileOption );
+        
+        this.db = new UI.Rtmap.MarkerDataRepo( this.af, DB.Path.fromUrl( '/map/marker' ) );
+        this.layer = new UI.Rtmap.MarkerLayer( this.db.getAll() );
+
+        this.layer.click$.map( event => this.toggleMarkerDraggable( event ) ).subscribe();
+        this.layer.dragStart$.flatMap( event => {
+            console.log( 'dragstart' );
+            let marker = event.target as DbMarker;
+            return marker.dragEnd$.take(1);
+        } ).flatMap( event => {
+            console.log( 'updating' );
+            let marker = event.target as DbMarker;
+            let latlng = marker.getLatLng();
+            return Observable.fromPromise( this.db.update( marker.key, latlng.lat, latlng.lng, 1) ); 
+        } ).subscribe(); 
+    }
+    
+    private toggleMarkerDraggable( event: Leaflet.Event ) {
+        let marker = event.target as DbMarker;
         if( marker.options.draggable ) {
+            console.log( 'undraggable' );
             marker.dragging.disable();
             marker.options.draggable = false;
         } else {
+            console.log( 'draggable' );
             marker.dragging.enable();
             marker.options.draggable = true;
         }
     }
     
-    startDraggingMarker( event: Leaflet.Event ) { 
+    private dragMarker( event: Leaflet.Event ) { 
         let marker = event.target as DbMarker;
-        return marker.dragEnd$.take(1);
+        return marker.dragEnd$.take(1).flatMap( event => {
+            let marker = event.target as DbMarker;
+            let latlng = marker.getLatLng();
+            return Observable.fromPromise( this.db.update( marker.key, latlng.lat, latlng.lng, 1) ); 
+        } );
     }
     
-    endDraggingMarker( event: Leaflet.Event ) {
-        let marker = event.target as DbMarker;
-        let latlng = marker.getLatLng();
-        return Observable.fromPromise( this.db.update( marker.key, latlng.lat, latlng.lng, 1) ); 
+    onDestroy(): void {
+        this.subscription.unsubscribe();
     }
 }
 
@@ -125,15 +110,19 @@ class MyMapControl extends Map.Control {
   templateUrl: './map-view.component.html',
   styleUrls: ['./map-view.component.scss']
 })
-export class MapViewComponent implements OnInit {
+export class MapViewComponent implements OnInit, OnDestroy {
     mapControl: MyMapControl;
-    constructor( private af: AngularFire, private location: Location, private router: Router ) {
+    constructor( private af: AngularFire, private re: Renderer2, private location: Location, private router: Router ) {
         this.mapControl = new MyMapControl( af );
     }
 
     ngOnInit() {
     }
 
+    ngOnDestroy() {
+        this.mapControl.onDestroy();
+    }
+    
     goBack() {
         this.location.back();
     }

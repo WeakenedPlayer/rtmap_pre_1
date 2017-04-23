@@ -4,7 +4,10 @@ import { Observable, Subject } from 'rxjs';
 export class MarkerObservable {
     private static fromEvent<EVENT extends Leaflet.Event>( marker: Leaflet.Marker, type: string ): Observable<EVENT> {
         let subject: Subject<EVENT> = new Subject();
-        marker.addEventListener( type, event => subject.next( event as EVENT ) );
+        marker.addEventListener( type, event => {
+            // console.log( type );
+            subject.next( event as EVENT ); 
+        } );
         return subject.asObservable();
     }
     
