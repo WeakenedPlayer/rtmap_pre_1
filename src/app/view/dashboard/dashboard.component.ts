@@ -2,7 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { CharacterProfile } from './sub/profile/character-profile';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
-import { ID } from 'service';
+import { ID } from 'app/service';
 
 @Component({
   selector: 'app-dashboard',
@@ -12,12 +12,12 @@ import { ID } from 'service';
 export class DashboardComponent implements OnInit {
     profile: CharacterProfile;
     constructor( private location: Location, private router: Router, private ids: ID.Service ) {
-        this.profile = new CharacterProfile( 'hello', 'world', 'faction', '123');
-        console.log( this.profile );
+        this.profile = new CharacterProfile( '***', '****', '****', '****');
+//        console.log( this.profile );
     }
 
     ngOnInit() {
-        console.log( this.profile );
+//        console.log( this.profile );
     }
 
     goBack() {

@@ -1,5 +1,5 @@
 import { Component, OnInit, Input  } from '@angular/core';
-import { Census } from 'service';
+import { Census } from 'component';
 import { CharacterProfile } from './character-profile';
 
 @Component({
@@ -13,6 +13,6 @@ export class ProfileComponent implements OnInit {
     }
 
     ngOnInit() {
-        console.log( this.profile);
+//        console.log( this.profile);
     }
 }

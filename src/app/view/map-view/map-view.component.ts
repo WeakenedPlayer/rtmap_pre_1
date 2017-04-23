@@ -1,8 +1,11 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Renderer2 } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
-import { Leaflet, Map } from '../../ui';
-import { Observable } from 'rxjs';
+import { Observable, Subject, Subscription } from 'rxjs';
+import { AngularFire } from 'angularfire2';
+import { Leaflet, Map, DB, ChangeObservable } from 'component';
+import { UI } from 'app/ui';
+
 
 const MapOption: Leaflet.MapOptions = {
         crs: Leaflet.CRS.Simple,
@@ -30,39 +33,76 @@ const ContinentInfoList = [
     { id: 4, name: 'Hossin', url: 'https://raw.githubusercontent.com/WeakenedPlayer/resource/master/map/hossin/{z}/{y}/{x}.jpg'}
 ];
 
+
+class DbMarker extends Map.ReactiveMarker {
+    constructor( public key: string, latLng: Leaflet.LatLngExpression ){
+        super( latLng );
+    } 
+}
+
 class MyMapControl extends Map.Control {
+    private db: UI.Rtmap.MarkerDataRepo;
+    private layer: UI.Rtmap.MarkerLayer;
     private tile: Leaflet.TileLayer;
-    private obs: Map.MarkerEvenetObservable = new Map.MarkerEvenetObservable();
-    private markers: Map.MarkerLayer = new Map.MarkerLayer( this.obs );
-    
-    protected postMapCreated(): void {
-        this.tile = Leaflet.tileLayer( ContinentInfoList[0].url, TileOption );
-        this.map.addLayer( this.tile );
-        this.map.addLayer( this.markers.getLayerGroup() );
-        
-        let operations = [ new Map.MarkerMoveOperation( '1', 0, 0, MarkerOptions),
-                           new Map.MarkerMoveOperation( '2', 0, 100, MarkerOptions ),
-                           new Map.MarkerMoveOperation( '3', -100, 0, MarkerOptions ),];
-        
-        Observable.of( operations ).subscribe( this.markers );
-        this.obs.click$.subscribe( evt => { console.log( 'click ' + evt.key ) } );
-        this.obs.doubleClick$.subscribe( evt => { console.log( 'double click ' + evt.key ) } );
-        this.obs.mouseOver$.subscribe( evt => { console.log( 'mouse over ' + evt.key ) } );
-        this.obs.mouseDown$.subscribe( evt => { console.log( 'mouse down ' + evt.key ) } );
-        this.obs.mouseOut$.subscribe( evt => { console.log( 'mouse out ' + evt.key ) } );
-        this.obs.dragStart$.subscribe( evt => { console.log( 'drag start ' + evt.key ) } );
-        this.obs.drag$.subscribe( evt => { console.log( 'drag ' + evt.key ) } );
-        this.obs.dragEnd$.subscribe( evt => { console.log( 'drag end ' + evt.key ) } );
-    }
-    
+    private subscription: Subscription;
+
     protected mapOptions(): Leaflet.MapOptions {
         return MapOption;
     }
 
-    constructor() {
+    protected postRegistered(): void {
+        this.map.addLayer( this.tile );
+        this.map.addLayer( this.layer );
+        this.subscription = this.layer.sync$.subscribe();
+    }
+
+    constructor( private af: AngularFire ) {
         super();
+        this.tile = Leaflet.tileLayer( ContinentInfoList[0].url, TileOption );
+        
+        this.db = new UI.Rtmap.MarkerDataRepo( this.af, DB.Path.fromUrl( '/map/marker' ) );
+        this.layer = new UI.Rtmap.MarkerLayer( this.db.getAll() );
+
+        this.layer.click$.map( event => this.toggleMarkerDraggable( event ) ).subscribe();
+        this.layer.dragStart$.flatMap( event => {
+            console.log( 'dragstart' );
+            let marker = event.target as DbMarker;
+            return marker.dragEnd$.take(1);
+        } ).flatMap( event => {
+            console.log( 'updating' );
+            let marker = event.target as DbMarker;
+            let latlng = marker.getLatLng();
+            return Observable.fromPromise( this.db.update( marker.key, latlng.lat, latlng.lng, 1) ); 
+        } ).subscribe(); 
+    }
+    
+    private toggleMarkerDraggable( event: Leaflet.Event ) {
+        let marker = event.target as DbMarker;
+        if( marker.options.draggable ) {
+            console.log( 'undraggable' );
+            marker.dragging.disable();
+            marker.options.draggable = false;
+        } else {
+            console.log( 'draggable' );
+            marker.dragging.enable();
+            marker.options.draggable = true;
+        }
+    }
+    
+    private dragMarker( event: Leaflet.Event ) { 
+        let marker = event.target as DbMarker;
+        return marker.dragEnd$.take(1).flatMap( event => {
+            let marker = event.target as DbMarker;
+            let latlng = marker.getLatLng();
+            return Observable.fromPromise( this.db.update( marker.key, latlng.lat, latlng.lng, 1) ); 
+        } );
+    }
+    
+    onDestroy(): void {
+        this.subscription.unsubscribe();
     }
 }
+
 
 
 @Component({
@@ -70,15 +110,19 @@ class MyMapControl extends Map.Control {
   templateUrl: './map-view.component.html',
   styleUrls: ['./map-view.component.scss']
 })
-export class MapViewComponent implements OnInit {
+export class MapViewComponent implements OnInit, OnDestroy {
     mapControl: MyMapControl;
-    constructor( private location: Location, private router: Router ) {
-        this.mapControl = new MyMapControl();
+    constructor( private af: AngularFire, private re: Renderer2, private location: Location, private router: Router ) {
+        this.mapControl = new MyMapControl( af );
     }
 
     ngOnInit() {
     }
 
+    ngOnDestroy() {
+        this.mapControl.onDestroy();
+    }
+    
     goBack() {
         this.location.back();
     }

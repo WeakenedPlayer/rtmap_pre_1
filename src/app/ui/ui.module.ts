@@ -4,14 +4,14 @@ import { RouterModule, Routes } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
-import { LeafletMapComponent } from './leaflet/map.component';
+import { MapComponent } from './rtmap/rtmap.component';
 
 @NgModule({
-  declarations: [ LeafletMapComponent ],
+  declarations: [ MapComponent ],
   imports: [ BrowserModule,
              CommonModule,
              ReactiveFormsModule ],
-  exports: [ LeafletMapComponent ],
+  exports: [ MapComponent ],
   providers: []
 })
 export class UiModule { }
