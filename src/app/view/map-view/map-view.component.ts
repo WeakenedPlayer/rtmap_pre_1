@@ -33,13 +33,6 @@ const ContinentInfoList = [
     { id: 4, name: 'Hossin', url: 'https://raw.githubusercontent.com/WeakenedPlayer/resource/master/map/hossin/{z}/{y}/{x}.jpg'}
 ];
 
-
-class DbMarker extends Map.ReactiveMarker {
-    constructor( public key: string, latLng: Leaflet.LatLngExpression ){
-        super( latLng );
-    } 
-}
-
 class MyMapControl extends Map.Control {
     private db: UI.Rtmap.MarkerDataRepo;
     private layer: UI.Rtmap.MarkerLayer;
@@ -64,35 +57,24 @@ class MyMapControl extends Map.Control {
         this.layer = new UI.Rtmap.MarkerLayer( this.db.getAll() );
 
         this.layer.click$.map( event => this.toggleMarkerDraggable( event ) ).subscribe();
-        this.layer.dragStart$.flatMap( event => {
-            console.log( 'dragstart' );
-            let marker = event.target as DbMarker;
-            return marker.dragEnd$.take(1);
-        } ).flatMap( event => {
-            console.log( 'updating' );
-            let marker = event.target as DbMarker;
-            let latlng = marker.getLatLng();
-            return Observable.fromPromise( this.db.update( marker.key, latlng.lat, latlng.lng, 1) ); 
-        } ).subscribe(); 
+        this.layer.dragStart$.flatMap( event => this.dragMarker( event )　).subscribe(); 
     }
     
     private toggleMarkerDraggable( event: Leaflet.Event ) {
-        let marker = event.target as DbMarker;
+        let marker = event.target as Map.Marker;
         if( marker.options.draggable ) {
-            console.log( 'undraggable' );
             marker.dragging.disable();
             marker.options.draggable = false;
         } else {
-            console.log( 'draggable' );
             marker.dragging.enable();
             marker.options.draggable = true;
         }
     }
     
     private dragMarker( event: Leaflet.Event ) { 
-        let marker = event.target as DbMarker;
+        let marker = event.target as Map.Marker;
         return marker.dragEnd$.take(1).flatMap( event => {
-            let marker = event.target as DbMarker;
+            let marker = event.target as Map.Marker;
             let latlng = marker.getLatLng();
             return Observable.fromPromise( this.db.update( marker.key, latlng.lat, latlng.lng, 1) ); 
         } );

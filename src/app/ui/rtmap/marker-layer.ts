@@ -3,36 +3,18 @@ import { ChangeObservable, Map } from 'component';
 import * as Leaflet from 'leaflet';
 import * as This from './modules';
 
-class DbMarker extends Map.ReactiveMarker {
-    constructor( public key: string, latLng: Leaflet.LatLngExpression ){
-        super( latLng );
-    } 
-}
-
 /* ####################################################################################################################
  * DBと同期したマーカを表示する。
  * 今のところ座標とアイコンだけ設定できる。
  * アクセス権は今後見直したい。
  * ################################################################################################################# */
-export class MarkerLayer extends Leaflet.LayerGroup {
-    private markers: { [key: string]: DbMarker } = {};
+export class MarkerLayer extends Map.MarkerSet<Map.Marker> {
     /* ----------------------------------------------------------------------------------------------------------------
      * マーカ更新タスク
      * ------------------------------------------------------------------------------------------------------------- */
     private synchronizerTask: Observable<void>;
     public get sync$(){ return this.synchronizerTask; }
     
-    /* ----------------------------------------------------------------------------------------------------------------
-     * マーカ共通のイベント
-     * 対象とするマーカのイベントが発火した時点で共通で作動する。
-     * Eventのターゲットが DbMarker なので、そこから対象を特定することができるようになっている。
-     * ------------------------------------------------------------------------------------------------------------- */
-    private clickSubject: Subject<Leaflet.Event> = new Subject();
-    private dragStartSubject: Subject<Leaflet.Event> = new Subject();
-
-    public get click$() { return this.clickSubject.asObservable(); }
-    public get dragStart$() { return this.dragStartSubject.asObservable(); }
-
     /* ----------------------------------------------------------------------------------------------------------------
      * コンストラクタ
      * ------------------------------------------------------------------------------------------------------------- */
@@ -45,8 +27,7 @@ export class MarkerLayer extends Leaflet.LayerGroup {
                 ( obj )=> obj.ts )
         .map( dbdata => {
              for( let datum of dbdata ) {
-                 // アイコン変更は後で実装
-                 this.markers[ datum.key ].setLatLng( [ datum.lat, datum.lng ] );
+                 this.getMarker( datum.key ).setLatLng( [ datum.lat, datum.lng ] );
              }
         } );
         
@@ -55,11 +36,8 @@ export class MarkerLayer extends Leaflet.LayerGroup {
                 ( obj )=> obj.key )
         .map( markers => {
             for( let marker of markers ) {
-                let m = new DbMarker( marker.key, [ marker.lat, marker.lng ] )
-                            .addEventListener( 'click', event => { this.clickSubject.next( event ); } )
-                            .addEventListener( 'dragstart', event => { this.dragStartSubject.next( event ); } );
-                this.markers[ marker.key ] = m;
-                this.addLayer( m );
+                let m = new Map.Marker( marker.key, [ marker.lat, marker.lng ] );
+                this.addMarker( m );
             }
         } );
         
@@ -68,7 +46,7 @@ export class MarkerLayer extends Leaflet.LayerGroup {
                 ( obj )=> obj.key )
         .map( keys => {
             for( let key of keys ) {
-                this.markers[ key ].remove();
+                this.removeMarker( key );
             }
         } );
         

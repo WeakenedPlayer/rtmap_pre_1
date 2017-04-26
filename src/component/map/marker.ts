@@ -2,7 +2,7 @@ import * as Leaflet from 'leaflet';
 import * as This from './modules';
 import { Observable } from 'rxjs';
 
-export class ReactiveMarker extends Leaflet.Marker {
+export class Marker extends Leaflet.Marker {
     private clickObservable: Observable<Leaflet.MouseEvent> = This.MarkerObservable.fromClickEvent( this ).publish().refCount();
     private doubleClickObservable: Observable<Leaflet.MouseEvent> = This.MarkerObservable.fromDoubleClickEvent( this ).publish().refCount();
     private mouseDownObservable: Observable<Leaflet.MouseEvent> = This.MarkerObservable.fromMouseDownEvent( this ).publish().refCount();
@@ -12,7 +12,7 @@ export class ReactiveMarker extends Leaflet.Marker {
     private dragStartObservable: Observable<Leaflet.Event> = This.MarkerObservable.fromDragStartEvent( this ).publish().refCount();
     private dragObservable: Observable<Leaflet.Event> = This.MarkerObservable.fromDragEvent( this ).publish().refCount();
     private dragEndObservable: Observable<Leaflet.Event> = This.MarkerObservable.fromDragEndEvent( this ).publish().refCount();
-
+    
     get click$() { return this.clickObservable; }
     get doubleClick$() { return this.doubleClickObservable; }
     get mouseDown$() { return this.mouseDownObservable; }
@@ -22,8 +22,8 @@ export class ReactiveMarker extends Leaflet.Marker {
     get dragStart$() { return this.dragStartObservable; }
     get drag$() { return this.dragObservable; }
     get dragEnd$() { return this.dragEndObservable; }
-
-    constructor( latLng: Leaflet.LatLngExpression, options?: Leaflet.MarkerOptions ) {
+    
+    constructor( public readonly key: string, latLng: Leaflet.LatLngExpression, options?: Leaflet.MarkerOptions ) {
         super( latLng, options );
     }
 }

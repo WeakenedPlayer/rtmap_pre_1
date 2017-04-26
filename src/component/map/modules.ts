@@ -1,3 +1,4 @@
 export * from './map-control';
-export * from './reactive-marker';
+export * from './marker';
+export * from './marker-set';
 export * from './marker-observable';
